@@ -81,6 +81,10 @@ ifeq ($(strip $(USE_ALBANY)), TRUE)
    USE_CXX = true
 endif
 
+ifeq ($(strip $(USE_FMS)), TRUE)
+  SLIBS += -lfms
+endif
+
 ifndef MOD_SUFFIX
    MOD_SUFFIX := mod
 endif
@@ -481,6 +485,12 @@ ifeq ($(findstring -cosp,$(CAM_CONFIG_OPTS)),-cosp)
 COSP_LIBDIR:=$(abspath $(EXEROOT)/atm/obj/cosp)
 endif
 
+ifeq ($(findstring -fv3core,$(CAM_CONFIG_OPTS)),-fv3core)
+FV3CORE_LIBDIR:=$(abspath $(EXEROOT)/atm/obj/atmos_cubed_sphere)
+INCLDIR+=-I$(FV3CORE_LIBDIR) -I$(FV3CORE_LIBDIR)/../ -I../$(INSTALL_SHAREDPATH)/include -I../$(CSM_SHR_INCLUDE) -I$(abspath $(EXEROOT)/FMS)
+endif
+
+
 ifeq ($(MODEL),cam)
   # These RRTMG files take an extraordinarily long time to compile with optimization.
   # Until mods are made to read the data from files, just remove optimization from
@@ -502,6 +512,13 @@ $(COSP_LIBDIR)/libcosp.a: cam_abortutils.o
 cospsimulator_intr.o: $(COSP_LIBDIR)/libcosp.a
 endif
 
+ifdef FV3CORE_LIBDIR
+$(FV3CORE_LIBDIR)/libfv3core.a: $(EXEROOT)/FMS/libfms.a
+	echo $(EXEROOT)
+	$(MAKE) -C $(FV3CORE_LIBDIR) complib COMPLIB='$(FV3CORE_LIBDIR)/libfv3core.a' F90='$(FC)' FFLAGS='$(FFLAGS) $(FC_AUTO_R8)' INCLUDE_DIR=$(abspath $(EXEROOT)/atm/obj) EXEROOT=$(abspath $(EXEROOT))
+
+dyn_grid.o: $(FV3CORE_LIBDIR)/libfv3core.a
+endif
 endif
 
 # Set esmf.mk location with ESMF_LIBDIR having precedent over ESMFMKFILE
@@ -814,6 +831,10 @@ ifdef COSP_LIBDIR
   ULIBDEP += $(COSP_LIBDIR)/libcosp.a
 endif
 
+ifdef FV3CORE_LIBDIR
+  ULIBDEP += $(FV3CORE_LIBDIR)/libfv3core.a
+  ULIBDEP += $(EXEROOT)/FMS/libfms.a
+endif
 
 ifndef CLIBS
    ifdef ULIBDEP

@@ -953,22 +953,16 @@
 	<command name="purge"></command>
       </modules>
       <modules compiler="intel">
-	<command name="load">compiler/intel/15.0.2.164</command>
-      </modules>
-      <modules compiler="intel" mpilib="mvapich2">
-	<command name="load">  tool/parallel-netcdf/1.7.0/intel/mvapich2  </command>
+	<command name="load">compiler/intel/18.0.3</command>
       </modules>
       <modules compiler="pgi">
-	<command name="load">compiler/pgi/17.04</command>
-      </modules>
-      <modules  compiler="pgi" mpilib="mvapich2">
-	  <command name="load">  tool/parallel-netcdf/1.6.1/pgi/mvapich2  </command>
+	<command name="load">compiler/pgi/18.1</command>
       </modules>
       <modules compiler="nag">
-	<command name="load">compiler/nag/6.1</command>
+	<command name="load">compiler/nag/6.2</command>
       </modules>
       <modules compiler="gnu" mpilib="openmpi">
-	<command name="load">compiler/gnu/5.4.0</command>
+	<command name="load">compiler/gnu/compiler/gnu/8.1.0</command>
 	<command name="load">  tool/parallel-netcdf/1.8.1/gnu-5.4.0/openmpi  </command>
       </modules>
     </module_system>
