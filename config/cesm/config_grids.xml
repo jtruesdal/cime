@@ -1504,32 +1504,32 @@
 
     <domain name="C48">
       <nx>13824</nx> <ny>1</ny>
-      <file grid="atm|lnd" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.lnd.C48_gx1v6.180601.nc</file>
-      <file grid="ocnice" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C48_gx1v6.180601.nc</file>
+      <file grid="atm|lnd" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.lnd.C48_gx1v6.181018.nc</file>
+      <file grid="ocnice" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C48_gx1v6.181018.nc</file>
       <desc>C48 is a fvcubed xx-deg grid:</desc>
       <support>Experimental for fv3 dycore</support>
     </domain>
 
     <domain name="C96">
       <nx>55296</nx> <ny>1</ny>
-      <file grid="atm|lnd" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.lnd.C96_gx1v6.180606.nc</file>
-      <file grid="ocnice" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C96_gx1v6.180606.nc</file>
+      <file grid="atm|lnd" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.lnd.C96_gx1v6.181018.nc</file>
+      <file grid="ocnice" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C96_gx1v6.181018.nc</file>
       <desc>C96 is a fvcubed xx-deg grid:</desc>
       <support>Experimental for fv3 dycore</support>
     </domain>
 
     <domain name="C192">
       <nx>221184</nx> <ny>1</ny>
-      <file grid="atm|lnd" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.lnd.C192_gx1v6.140925.nc</file>
-      <file grid="ocnice" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C192_gx1v6.140925.nc</file>
+      <file grid="atm|lnd" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.lnd.C192_gx1v6.181018..nc</file>
+      <file grid="ocnice" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C192_gx1v6.181018.nc</file>
       <desc>C192 is a fvcubed xx-deg grid:</desc>
       <support>Experimental for fv3 dycore</support>
     </domain>
 
     <domain name="C384">
       <nx>884736</nx> <ny>1</ny>
-      <file grid="atm|lnd" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.lnd.C384_gx1v6.140925.nc</file>
-      <file grid="ocnice" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C384_gx1v6.140925.nc</file>
+      <file grid="atm|lnd" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.lnd.C384_gx1v6.181018.nc</file>
+      <file grid="ocnice" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C384_gx1v6.181018.nc</file>
       <desc>C384 is a fvcubed xx-deg grid:</desc>
       <support>Experimental for fv3 dycore</support>
     </domain>
@@ -1654,63 +1654,63 @@
     </gridmap>
 
     <gridmap atm_grid="C48" ocn_grid="gx1v6">
-      <map name="ATM2OCN_FMAPNAME">cpl/cpl6/map_C48_TO_gx1v6_aave.180606.nc</map>
-      <map name="ATM2OCN_SMAPNAME">cpl/cpl6/map_C48_TO_gx1v6_blin.180606.nc</map>
-      <map name="ATM2OCN_VMAPNAME">cpl/cpl6/map_C48_TO_gx1v6_patc.180606.nc</map>
-      <map name="OCN2ATM_FMAPNAME">cpl/cpl6/map_gx1v6_TO_C48_aave.180606.nc</map>
-      <map name="OCN2ATM_SMAPNAME">cpl/cpl6/map_gx1v6_TO_C48_aave.180606.nc</map>
+      <map name="ATM2OCN_FMAPNAME">cpl/gridmaps/C48/map_C48_TO_gx1v6_aave.181018.nc</map>
+      <map name="ATM2OCN_SMAPNAME">cpl/gridmaps/C48/map_C48_TO_gx1v6_blin.181018.nc</map>
+      <map name="ATM2OCN_VMAPNAME">cpl/gridmaps/C48/map_C48_TO_gx1v6_patc.181018.nc</map>
+      <map name="OCN2ATM_FMAPNAME">cpl/gridmaps/C48/map_gx1v6_TO_C48_aave.181018.nc</map>
+      <map name="OCN2ATM_SMAPNAME">cpl/gridmaps/C48/map_gx1v6_TO_C48_aave.181018.nc</map>
     </gridmap>
 
     <gridmap atm_grid="C48" lnd_grid="1.9x2.5">
-      <map name="ATM2LND_FMAPNAME">cpl/cpl6/map_C48_TO_1.9x2.5_aave.180809.nc</map>
-      <map name="ATM2LND_SMAPNAME">cpl/cpl6/map_C48_TO_1.9x2.5_aave.180809.nc</map>
-      <map name="LND2ATM_FMAPNAME">cpl/cpl6/map_1.9x2.5_TO_C48_aave.180809.nc</map>
-      <map name="LND2ATM_SMAPNAME">cpl/cpl6/map_1.9x2.5_TO_C48_aave.180809.nc</map>
+      <map name="ATM2LND_FMAPNAME">cpl/gridmaps/C48/map_C48_TO_1.9x2.5_aave.181018.nc</map>
+      <map name="ATM2LND_SMAPNAME">cpl/gridmaps/C48/map_C48_TO_1.9x2.5_aave.181018.nc</map>
+      <map name="LND2ATM_FMAPNAME">cpl/gridmaps/C48/map_1.9x2.5_TO_C48_aave.181018.nc</map>
+      <map name="LND2ATM_SMAPNAME">cpl/gridmaps/C48/map_1.9x2.5_TO_C48_aave.181018.nc</map>
     </gridmap>
 
     <gridmap atm_grid="C96" ocn_grid="gx1v6">
-      <map name="ATM2OCN_FMAPNAME">cpl/cpl6/map_C96_TO_gx1v6_aave.180606.nc</map>
-      <map name="ATM2OCN_SMAPNAME">cpl/cpl6/map_C96_TO_gx1v6_blin.180606.nc</map>
-      <map name="ATM2OCN_VMAPNAME">cpl/cpl6/map_C96_TO_gx1v6_patc.180606.nc</map>
-      <map name="OCN2ATM_FMAPNAME">cpl/cpl6/map_gx1v6_TO_C96_aave.180606.nc</map>
-      <map name="OCN2ATM_SMAPNAME">cpl/cpl6/map_gx1v6_TO_C96_aave.180606.nc</map>
+      <map name="ATM2OCN_FMAPNAME">cpl/gridmaps/C96/map_C96_TO_gx1v6_aave.181018.nc</map>
+      <map name="ATM2OCN_SMAPNAME">cpl/gridmaps/C96/map_C96_TO_gx1v6_blin.181018.nc</map>
+      <map name="ATM2OCN_VMAPNAME">cpl/gridmaps/C96/map_C96_TO_gx1v6_patc.181018.nc</map>
+      <map name="OCN2ATM_FMAPNAME">cpl/gridmaps/C96/map_gx1v6_TO_C96_aave.181018.nc</map>
+      <map name="OCN2ATM_SMAPNAME">cpl/gridmaps/C96/map_gx1v6_TO_C96_aave.181018.nc</map>
     </gridmap>
 
     <gridmap atm_grid="C96" lnd_grid="0.9x1.25">
-      <map name="ATM2LND_FMAPNAME">cpl/cpl6/map_C96_TO_0.9x1.25_aave.180809.nc</map>
-      <map name="ATM2LND_SMAPNAME">cpl/cpl6/map_C96_TO_0.9x1.25_aave.180809.nc</map>
-      <map name="LND2ATM_FMAPNAME">cpl/cpl6/map_0.9x1.25_TO_C96_aave.180809.nc</map>
-      <map name="LND2ATM_SMAPNAME">cpl/cpl6/map_0.9x1.25_TO_C96_aave.180809.nc</map>
+      <map name="ATM2LND_FMAPNAME">cpl/gridmaps/C96/map_C96_TO_0.9x1.25_aave.181018.nc</map>
+      <map name="ATM2LND_SMAPNAME">cpl/gridmaps/C96/map_C96_TO_0.9x1.25_aave.181018.nc</map>
+      <map name="LND2ATM_FMAPNAME">cpl/gridmaps/C96/map_0.9x1.25_TO_C96_aave.181018.nc</map>
+      <map name="LND2ATM_SMAPNAME">cpl/gridmaps/C96/map_0.9x1.25_TO_C96_aave.181018.nc</map>
     </gridmap>
 
     <gridmap atm_grid="C192" ocn_grid="gx1v6">
-      <map name="ATM2OCN_FMAPNAME">cpl/cpl6/map_am_C192_TO_pop_gx1v6_aave.140925.nc</map>
-      <map name="ATM2OCN_SMAPNAME">cpl/cpl6/map_am_C192_TO_pop_gx1v6_blin.140925.nc</map>
-      <map name="ATM2OCN_VMAPNAME">cpl/cpl6/map_am_C192_TO_pop_gx1v6_patc.140925.nc</map>
-      <map name="OCN2ATM_FMAPNAME">cpl/cpl6/map_pop_gx1v6_TO_am_C192_aave.140925.nc</map>
-      <map name="OCN2ATM_SMAPNAME">cpl/cpl6/map_pop_gx1v6_TO_am_C192_aave.140925.nc</map>
+      <map name="ATM2OCN_FMAPNAME">cpl/gridmaps/C192/map_am_C192_TO_pop_gx1v6_aave.181018.nc</map>
+      <map name="ATM2OCN_SMAPNAME">cpl/gridmaps/C192/map_am_C192_TO_pop_gx1v6_blin.181018.nc</map>
+      <map name="ATM2OCN_VMAPNAME">cpl/gridmaps/C192/map_am_C192_TO_pop_gx1v6_patc.181018.nc</map>
+      <map name="OCN2ATM_FMAPNAME">cpl/gridmaps/C192/map_pop_gx1v6_TO_am_C192_aave.181018.nc</map>
+      <map name="OCN2ATM_SMAPNAME">cpl/gridmaps/C192/map_pop_gx1v6_TO_am_C192_aave.181018.nc</map>
     </gridmap>
 
     <gridmap atm_grid="C192" lnd_grid="0.47x0.63">
-      <map name="ATM2LND_FMAPNAME">cpl/cpl6/map_am_C192_TO_clm_fv0.47x0.63_aave.140925.nc</map>
-      <map name="ATM2LND_SMAPNAME">cpl/cpl6/map_am_C192_TO_clm_fv0.47x0.63_aave.140925.nc</map>
-      <map name="LND2ATM_FMAPNAME">cpl/cpl6/map_clm_fv0.47x0.63_TO_am_C192_aave.140925.nc</map>
-      <map name="LND2ATM_SMAPNAME">cpl/cpl6/map_clm_fv0.47x0.63_TO_am_C192_aave.140925.nc</map>
+      <map name="ATM2LND_FMAPNAME">cpl/gridmaps/C192/map_am_C192_TO_clm_fv0.47x0.63_aave.181018.nc</map>
+      <map name="ATM2LND_SMAPNAME">cpl/gridmaps/C192/map_am_C192_TO_clm_fv0.47x0.63_aave.181018.nc</map>
+      <map name="LND2ATM_FMAPNAME">cpl/gridmaps/C192/map_clm_fv0.47x0.63_TO_am_C192_aave.181018.nc</map>
+      <map name="LND2ATM_SMAPNAME">cpl/gridmaps/C192/map_clm_fv0.47x0.63_TO_am_C192_aave.181018.nc</map>
     </gridmap>
 
     <gridmap atm_grid="C384" ocn_grid="gx1v6">
-      <map name="ATM2OCN_FMAPNAME">cpl/cpl6/map_am_C384_TO_pop_gx1v6_aave.140925.nc</map>
-      <map name="ATM2OCN_SMAPNAME">cpl/cpl6/map_am_C384_TO_pop_gx1v6_blin.140925.nc</map>
-      <map name="ATM2OCN_VMAPNAME">cpl/cpl6/map_am_C384_TO_pop_gx1v6_patc.140925.nc</map>
-      <map name="OCN2ATM_FMAPNAME">cpl/cpl6/map_pop_gx1v6_TO_am_C384_aave.140925.nc</map>
-      <map name="OCN2ATM_SMAPNAME">cpl/cpl6/map_pop_gx1v6_TO_am_C384_aave.140925.nc</map>
+      <map name="ATM2OCN_FMAPNAME">cpl/gridmaps/C384/map_am_C384_TO_pop_gx1v6_aave.181018.nc</map>
+      <map name="ATM2OCN_SMAPNAME">cpl/gridmaps/C384/map_am_C384_TO_pop_gx1v6_blin.181018.nc</map>
+      <map name="ATM2OCN_VMAPNAME">cpl/gridmaps/C384/map_am_C384_TO_pop_gx1v6_patc.181018.nc</map>
+      <map name="OCN2ATM_FMAPNAME">cpl/gridmaps/C384/map_pop_gx1v6_TO_am_C384_aave.181018.nc</map>
+      <map name="OCN2ATM_SMAPNAME">cpl/gridmaps/C384/map_pop_gx1v6_TO_am_C384_aave.181018.nc</map>
     </gridmap>
 
     <gridmap atm_grid="C384" lnd_grid="0.23x0.31">
-      <map name="ATM2LND_FMAPNAME">cpl/cpl6/map_am_C384_TO_clm_fv0.23x0.31_aave.140925.nc</map>
-      <map name="ATM2LND_SMAPNAME">cpl/cpl6/map_am_C384_TO_clm_fv0.23x0.31_aave.140925.nc</map>
-      <map name="LND2ATM_FMAPNAME">cpl/cpl6/map_clm_fv0.23x0.31_TO_am_C384_aave.140925.nc</map>
-      <map name="LND2ATM_SMAPNAME">cpl/cpl6/map_clm_fv0.23x0.31_TO_am_C384_aave.140925.nc</map>
+      <map name="ATM2LND_FMAPNAME">cpl/gridmaps/C384/map_am_C384_TO_clm_fv0.23x0.31_aave.181018.nc</map>
+      <map name="ATM2LND_SMAPNAME">cpl/gridmaps/C384/map_am_C384_TO_clm_fv0.23x0.31_aave.181018.nc</map>
+      <map name="LND2ATM_FMAPNAME">cpl/gridmaps/C384/map_clm_fv0.23x0.31_TO_am_C384_aave.181018.nc</map>
+      <map name="LND2ATM_SMAPNAME">cpl/gridmaps/C384/map_clm_fv0.23x0.31_TO_am_C384_aave.181018.nc</map>
     </gridmap>
 
     <gridmap atm_grid="ne16np4" ocn_grid="gx1v7">
@@ -1967,13 +1967,13 @@
     <!--- river to land and land to river mapping files    -->
 
     <gridmap lnd_grid="C48" rof_grid="r05">
-      <map name="LND2ROF_FMAPNAME">lnd/clm2/mappingdata/maps/C48/map_C48_to_0.5x0.5_aave.180824.nc</map>
-      <map name="ROF2LND_FMAPNAME">lnd/clm2/mappingdata/maps/C48/map_0.5x0.5_to_C48_aave.180824.nc</map>
+      <map name="LND2ROF_FMAPNAME">lnd/clm2/mappingdata/maps/C48/map_C48_TO_0.5x0.5_aave.181018.nc</map>
+      <map name="ROF2LND_FMAPNAME">lnd/clm2/mappingdata/maps/C48/map_0.5x0.5_TO_C48_aave.181018.nc</map>
     </gridmap>
 
     <gridmap lnd_grid="C96" rof_grid="r05">
-      <map name="LND2ROF_FMAPNAME">lnd/clm2/mappingdata/maps/C96/map_C96_to_0.5x0.5_aave.180824.nc</map>
-      <map name="ROF2LND_FMAPNAME">lnd/clm2/mappingdata/maps/C96/map_0.5x0.5_to_C96_aave.180824.nc</map>
+      <map name="LND2ROF_FMAPNAME">lnd/clm2/mappingdata/maps/C96/map_C96_TO_0.5x0.5_aave.181018.nc</map>
+      <map name="ROF2LND_FMAPNAME">lnd/clm2/mappingdata/maps/C96/map_0.5x0.5_TO_C96_aave.181018.nc</map>
     </gridmap>
 
 
@@ -2173,17 +2173,17 @@
     <!-- ====================  -->
 
     <gridmap lnd_grid="C48" glc_grid="gland4" >
-      <map name="LND2GLC_FMAPNAME">cpl/gridmaps/C48/map_C48_TO_gland4km_aave.180824.nc</map>
-      <map name="LND2GLC_SMAPNAME">cpl/gridmaps/C48/map_C48_TO_gland4km_blin.180824.nc</map>
-      <map name="GLC2LND_FMAPNAME">cpl/gridmaps/gland4km/map_gland4km_TO_C48_aave.180824.nc</map>
-      <map name="GLC2LND_SMAPNAME">cpl/gridmaps/gland4km/map_gland4km_TO_C48_aave.180824.nc</map>
+      <map name="LND2GLC_FMAPNAME">cpl/gridmaps/C48/map_C48_TO_gland4km_aave.181018.nc</map>
+      <map name="LND2GLC_SMAPNAME">cpl/gridmaps/C48/map_C48_TO_gland4km_blin.181018.nc</map>
+      <map name="GLC2LND_FMAPNAME">cpl/gridmaps/gland4km/map_gland4km_TO_C48_aave.181018.nc</map>
+      <map name="GLC2LND_SMAPNAME">cpl/gridmaps/gland4km/map_gland4km_TO_C48_aave.181018.nc</map>
     </gridmap>
 
     <gridmap lnd_grid="C96" glc_grid="gland4" >
-      <map name="LND2GLC_FMAPNAME">cpl/gridmaps/C96/map_C96_TO_gland4km_aave.180824.nc</map>
-      <map name="LND2GLC_SMAPNAME">cpl/gridmaps/C96/map_C96_TO_gland4km_blin.180824.nc</map>
-      <map name="GLC2LND_FMAPNAME">cpl/gridmaps/gland4km/map_gland4km_TO_C96_aave.180824.nc</map>
-      <map name="GLC2LND_SMAPNAME">cpl/gridmaps/gland4km/map_gland4km_TO_C96_aave.180824.nc</map>
+      <map name="LND2GLC_FMAPNAME">cpl/gridmaps/C96/map_C96_TO_gland4km_aave.181018.nc</map>
+      <map name="LND2GLC_SMAPNAME">cpl/gridmaps/C96/map_C96_TO_gland4km_blin.181018.nc</map>
+      <map name="GLC2LND_FMAPNAME">cpl/gridmaps/gland4km/map_gland4km_TO_C96_aave.181018.nc</map>
+      <map name="GLC2LND_SMAPNAME">cpl/gridmaps/gland4km/map_gland4km_TO_C96_aave.181018.nc</map>
     </gridmap>
 
     <gridmap lnd_grid="0.47x0.63" glc_grid="gland4" >
