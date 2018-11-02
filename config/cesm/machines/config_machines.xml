@@ -1107,11 +1107,11 @@
 	<command name="purge"></command>
       </modules>
       <modules compiler="intel">
-	<command name="load">compiler/intel/18.0.3</command>
-	<command name="load">tool/netcdf/4.6.1/intel</command>
+        <command name="load">compiler/intel/17.0.4.196</command>
+        <command name="load">tool/netcdf/4.6.1/intel-17.0.4.196</command>
       </modules>
       <modules compiler="intel" mpilib="mvapich2">
-	<command name="load">mpi/intel/mvapich2-2.3rc2-intel-18.0.3</command>
+	<command name="load">mpi/intel/mvapich2-2.1-qlc</command>
       </modules>
       <modules compiler="pgi">
 	<command name="load">compiler/pgi/18.1</command>
