@@ -980,7 +980,7 @@
       <mask>gx1v7</mask>
     </model_grid>
 
-    <model_grid alias="C96_C96_mg17" compset="_CISM" not_compset="_POP" >
+    <model_grid alias="C96_C96_mg17" >
       <grid name="atm">C96</grid>
       <grid name="lnd">C96</grid>
       <grid name="ocnice">gx1v7</grid>
@@ -988,21 +988,21 @@
       <mask>gx1v7</mask>
     </model_grid>
 
-    <model_grid alias="C96_C96_mt061" not_compset="_POP" >
+    <model_grid alias="C96_C96_mt061" >
       <grid name="atm">C96</grid>
       <grid name="lnd">C96</grid>
       <grid name="ocnice">C96</grid>
       <mask>tx0.66v1</mask>
     </model_grid>
 
-    <model_grid alias="C96_t061" not_compset="_POP" >
+    <model_grid alias="C96_t061" >
       <grid name="atm">C96</grid>
       <grid name="lnd">C96</grid>
       <grid name="ocnice">tx0.66v1</grid>
       <mask>tx0.66v1</mask>
     </model_grid>
 
-    <model_grid alias="C96_t061" not_compset="_POP" >
+    <model_grid alias="C96_t061" >
       <grid name="atm">C96</grid>
       <grid name="lnd">C96</grid>
       <grid name="ocnice">tx0.66v1</grid>
@@ -1016,21 +1016,21 @@
 
 <!--  cubed-sphere finite-volume grids -->
 
-    <model_grid alias="C24_C24_mnull" compset="_DOCN%SAQUAP|DOCN%DAQUAP" >
+    <model_grid alias="C24_C24_mnull" >
       <grid name="atm">C24</grid>
       <grid name="lnd">C24</grid>
       <grid name="ocnice">C24</grid>
       <mask>null</mask>
     </model_grid>
 
-    <model_grid alias="C24_C24_mg16" not_compset="_POP" >
+    <model_grid alias="C24_C24_mg16" >
       <grid name="atm">C24</grid>
       <grid name="lnd">C24</grid>
       <grid name="ocnice">C24</grid>
       <mask>gx1v6</mask>
     </model_grid>
 
-    <model_grid alias="C24_C24_mg17" not_compset="_POP" >
+    <model_grid alias="C24_C24_mg17" >
       <grid name="atm">C24</grid>
       <grid name="lnd">C24</grid>
       <grid name="ocnice">C24</grid>
@@ -1038,42 +1038,42 @@
     </model_grid>
 
 
-    <model_grid alias="C48_C48_mnull" compset="_DOCN%SAQUAP|DOCN%DAQUAP" >
+    <model_grid alias="C48_C48_mnull" >
       <grid name="atm">C48</grid>
       <grid name="lnd">C48</grid>
       <grid name="ocnice">C48</grid>
       <mask>null</mask>
     </model_grid>
 
-    <model_grid alias="C48_C48_mg16" not_compset="_POP" >
+    <model_grid alias="C48_C48_mg16" >
       <grid name="atm">C48</grid>
       <grid name="lnd">C48</grid>
       <grid name="ocnice">C48</grid>
       <mask>gx1v6</mask>
     </model_grid>
 
-    <model_grid alias="C48_C48_mg17" not_compset="_POP" >
+    <model_grid alias="C48_C48_mg17" >
       <grid name="atm">C48</grid>
       <grid name="lnd">C48</grid>
       <grid name="ocnice">C48</grid>
       <mask>gx1v7</mask>
     </model_grid>
 
-    <model_grid alias="C96_C96_mnull" compset="_DOCN%SAQUAP|DOCN%DAQUAP" >
+    <model_grid alias="C96_C96_mnull" >
       <grid name="atm">C96</grid>
       <grid name="lnd">C96</grid>
       <grid name="ocnice">C96</grid>
       <mask>null</mask>
     </model_grid>
 
-    <model_grid alias="C96_C96_mg16" not_compset="_POP" >
+    <model_grid alias="C96_C96_mg16" >
       <grid name="atm">C96</grid>
       <grid name="lnd">C96</grid>
       <grid name="ocnice">C96</grid>
       <mask>gx1v6</mask>
     </model_grid>
 
-    <model_grid alias="C96_C96_mg17" not_compset="_POP" >
+    <model_grid alias="C96_C96_mg17" >
       <grid name="atm">C96</grid>
       <grid name="lnd">C96</grid>
       <grid name="ocnice">C96</grid>
@@ -1081,42 +1081,42 @@
     </model_grid>
 
 
-    <model_grid alias="C192_C192_mnull" compset="_DOCN%SAQUAP|DOCN%DAQUAP" >
+    <model_grid alias="C192_C192_mnull" >
       <grid name="atm">C192</grid>
       <grid name="lnd">C192</grid>
       <grid name="ocnice">C192</grid>
       <mask>null</mask>
     </model_grid>
 
-    <model_grid alias="C192_C192_mg16" not_compset="_POP" >
+    <model_grid alias="C192_C192_mg16" >
       <grid name="atm">C192</grid>
       <grid name="lnd">C192</grid>
       <grid name="ocnice">C192</grid>
       <mask>gx1v6</mask>
     </model_grid>
 
-    <model_grid alias="C192_C192_mg17" not_compset="_POP" >
+    <model_grid alias="C192_C192_mg17" >
       <grid name="atm">C192</grid>
       <grid name="lnd">C192</grid>
       <grid name="ocnice">C192</grid>
       <mask>gx1v7</mask>
     </model_grid>
 
-    <model_grid alias="C384_C384_mnull" compset="_DOCN%SAQUAP|DOCN%DAQUAP" >
+    <model_grid alias="C384_C384_mnull" >
       <grid name="atm">C384</grid>
       <grid name="lnd">C384</grid>
       <grid name="ocnice">C384</grid>
       <mask>null</mask>
     </model_grid>
 
-    <model_grid alias="C384_C384_mg16" not_compset="_POP" >
+    <model_grid alias="C384_C384_mg16" >
       <grid name="atm">C384</grid>
       <grid name="lnd">C384</grid>
       <grid name="ocnice">C384</grid>
       <mask>gx1v6</mask>
     </model_grid>
 
-    <model_grid alias="C384_C384_mg17" not_compset="_POP" >
+    <model_grid alias="C384_C384_mg17" >
       <grid name="atm">C384</grid>
       <grid name="lnd">C384</grid>
       <grid name="ocnice">C384</grid>

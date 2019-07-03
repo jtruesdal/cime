@@ -531,9 +531,11 @@ ifeq ($(findstring -cosp,$(CAM_CONFIG_OPTS)),-cosp)
   endif
 endif
 
-ifeq ($(findstring -fv3core,$(CAM_CONFIG_OPTS)),-fv3core)
+CAM_DYCORE ?= $(shell $(CASEROOT)/xmlquery --caseroot $(CASEROOT) CAM_DYCORE --value)
+
+ifeq ($(CAM_DYCORE),fv3)
 FV3CORE_LIBDIR:=$(abspath $(EXEROOT)/atm/obj/atmos_cubed_sphere)
-INCLDIR+=-I$(FV3CORE_LIBDIR) -I$(FV3CORE_LIBDIR)/../ -I../$(INSTALL_SHAREDPATH)/include -I../$(CSM_SHR_INCLUDE) -I$(abspath $(EXEROOT)/FMS)
+INCLDIR+=-I$(FV3CORE_LIBDIR) -I$(FV3CORE_LIBDIR)/../ -I../$(INSTALL_SHAREDPATH)/include -I../$(CSM_SHR_INCLUDE) -I$(abspath $(EXEROOT)/FMS) -I$(CIMEROOT)/../libraries/FMS/src/include
 endif
 
 
@@ -560,8 +562,7 @@ endif
 
 ifdef FV3CORE_LIBDIR
 $(FV3CORE_LIBDIR)/libfv3core.a: $(EXEROOT)/FMS/libfms.a
-	echo $(EXEROOT)
-	$(MAKE) -C $(FV3CORE_LIBDIR) complib COMPLIB='$(FV3CORE_LIBDIR)/libfv3core.a' F90='$(FC)' FFLAGS='$(FFLAGS) $(FC_AUTO_R8)' INCLUDE_DIR=$(abspath $(EXEROOT)/atm/obj) EXEROOT=$(abspath $(EXEROOT))
+	$(MAKE) -C $(FV3CORE_LIBDIR) -f $(CASETOOLS)/Makefile complib COMPLIB='$(FV3CORE_LIBDIR)/libfv3core.a' F90='$(FC)' FFLAGS='$(FFLAGS) $(FC_AUTO_R8)' INCLUDE_DIR=$(abspath $(EXEROOT)/atm/obj) EXEROOT=$(abspath $(EXEROOT)) USER_MKSRCFILES_OPTS='-e fv_iau_mod.F90'
 
 dyn_grid.o: $(FV3CORE_LIBDIR)/libfv3core.a
 endif
@@ -763,7 +764,7 @@ Deppath: Filepath
 	@echo "$(MINCROOT)" >> $@
 
 Srcfiles: Filepath
-	$(CASETOOLS)/mkSrcfiles
+	$(CASETOOLS)/mkSrcfiles $(USER_MKSRCFILES_OPTS) > $@
 
 Filepath:
 	@echo "$(VPATH)" > $@
