@@ -549,7 +549,6 @@ rrtmg_lw_k_g.o: rrtmg_lw_k_g.f90
 rrtmg_sw_k_g.o: rrtmg_sw_k_g.f90
 	$(FC) -c $(FPPFLAGS) $(INCLDIR) $(INCS) $(FREEFLAGS) $(FFLAGS_NOOPT) $<
 
-
 ifdef COSP_LIBDIR
 INCLDIR+=-I$(COSP_LIBDIR) -I$(COSP_LIBDIR)/../ -I../$(INSTALL_SHAREDPATH)/include -I../$(CSM_SHR_INCLUDE)
 $(COSP_LIBDIR)/libcosp.a: cam_abortutils.o
@@ -562,7 +561,7 @@ endif
 
 ifdef FV3CORE_LIBDIR
 $(FV3CORE_LIBDIR)/libfv3core.a: $(EXEROOT)/FMS/libfms.a
-	$(MAKE) -C $(FV3CORE_LIBDIR) -f $(CASETOOLS)/Makefile complib COMPLIB='$(FV3CORE_LIBDIR)/libfv3core.a' F90='$(FC)' FFLAGS='$(FFLAGS) $(FC_AUTO_R8)' INCLUDE_DIR=$(abspath $(EXEROOT)/atm/obj) EXEROOT=$(abspath $(EXEROOT)) USER_MKSRCFILES_OPTS='-e fv_iau_mod.F90'
+	$(MAKE) -C $(FV3CORE_LIBDIR) COMPLIB='$(FV3CORE_LIBDIR)/libfv3core.a' INCLDIR='$(INCLDIR)'
 
 dyn_grid.o: $(FV3CORE_LIBDIR)/libfv3core.a
 endif
