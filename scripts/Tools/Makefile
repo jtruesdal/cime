@@ -561,7 +561,7 @@ endif
 
 ifdef FV3CORE_LIBDIR
 $(FV3CORE_LIBDIR)/libfv3core.a: $(EXEROOT)/FMS/libfms.a
-	$(MAKE) -C $(FV3CORE_LIBDIR) COMPLIB='$(FV3CORE_LIBDIR)/libfv3core.a' INCLDIR='$(INCLDIR)'
+	$(MAKE) -C $(FV3CORE_LIBDIR) complib COMPLIB='$(FV3CORE_LIBDIR)/libfv3core.a' F90='$(FC)' CC='$(CC)' FFLAGS='$(FFLAGS) $(FC_AUTO_R8)'  CFLAGS='$(CFLAGS)' INCLDIR='$(INCLDIR)' FC_TYPE='$(COMPILER)'
 
 dyn_grid.o: $(FV3CORE_LIBDIR)/libfv3core.a
 endif
