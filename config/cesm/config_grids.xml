@@ -1065,7 +1065,7 @@
       <mask>gx1v7</mask>
     </model_grid>
 
-    <model_grid alias="C96_C96_mg17" compset="_CISM" not_compset="_POP" >
+    <model_grid alias="C96_C96_mg17" >
       <grid name="atm">C96</grid>
       <grid name="lnd">C96</grid>
       <grid name="ocnice">gx1v7</grid>
@@ -1073,37 +1073,139 @@
       <mask>gx1v7</mask>
     </model_grid>
 
-    <model_grid alias="C96_C96_mt061" not_compset="_POP" >
+    <model_grid alias="C96_C96_mt061" >
       <grid name="atm">C96</grid>
       <grid name="lnd">C96</grid>
       <grid name="ocnice">C96</grid>
       <mask>tx0.66v1</mask>
     </model_grid>
 
-    <model_grid alias="C96_t061" not_compset="_POP" >
+    <model_grid alias="C96_t061" >
       <grid name="atm">C96</grid>
       <grid name="lnd">C96</grid>
       <grid name="ocnice">tx0.66v1</grid>
       <mask>tx0.66v1</mask>
     </model_grid>
 
-    <model_grid alias="C96_t025" not_compset="_POP" >
+    <model_grid alias="C96_t061" >
       <grid name="atm">C96</grid>
       <grid name="lnd">C96</grid>
-      <grid name="ocnice">tx0.25v1</grid>
-      <mask>tx0.25v1</mask>
-    </model_grid>
-
-    <model_grid alias="C384_t025" not_compset="_POP" >
-      <grid name="atm">C384</grid>
-      <grid name="lnd">C384</grid>
-      <grid name="ocnice">tx0.25v1</grid>
-      <mask>tx0.25v1</mask>
+      <grid name="ocnice">tx0.66v1</grid>
+      <mask>tx0.66v1</mask>
     </model_grid>
 
     <!-- The following grid is only used for ADWAV testing -->
     <model_grid alias="ww3a" compset="_WW3|DWAV">
       <grid name="wav">ww3a</grid>
+    </model_grid>
+
+<!--  cubed-sphere finite-volume grids -->
+
+    <model_grid alias="C24_C24_mnull" >
+      <grid name="atm">C24</grid>
+      <grid name="lnd">C24</grid>
+      <grid name="ocnice">C24</grid>
+      <mask>null</mask>
+    </model_grid>
+
+    <model_grid alias="C24_C24_mg16" >
+      <grid name="atm">C24</grid>
+      <grid name="lnd">C24</grid>
+      <grid name="ocnice">C24</grid>
+      <mask>gx1v6</mask>
+    </model_grid>
+
+    <model_grid alias="C24_C24_mg17" >
+      <grid name="atm">C24</grid>
+      <grid name="lnd">C24</grid>
+      <grid name="ocnice">C24</grid>
+      <mask>gx1v7</mask>
+    </model_grid>
+
+
+    <model_grid alias="C48_C48_mnull" >
+      <grid name="atm">C48</grid>
+      <grid name="lnd">C48</grid>
+      <grid name="ocnice">C48</grid>
+      <mask>null</mask>
+    </model_grid>
+
+    <model_grid alias="C48_C48_mg16" >
+      <grid name="atm">C48</grid>
+      <grid name="lnd">C48</grid>
+      <grid name="ocnice">C48</grid>
+      <mask>gx1v6</mask>
+    </model_grid>
+
+    <model_grid alias="C48_C48_mg17" >
+      <grid name="atm">C48</grid>
+      <grid name="lnd">C48</grid>
+      <grid name="ocnice">C48</grid>
+      <mask>gx1v7</mask>
+    </model_grid>
+
+    <model_grid alias="C96_C96_mnull" >
+      <grid name="atm">C96</grid>
+      <grid name="lnd">C96</grid>
+      <grid name="ocnice">C96</grid>
+      <mask>null</mask>
+    </model_grid>
+
+    <model_grid alias="C96_C96_mg16" >
+      <grid name="atm">C96</grid>
+      <grid name="lnd">C96</grid>
+      <grid name="ocnice">C96</grid>
+      <mask>gx1v6</mask>
+    </model_grid>
+
+    <model_grid alias="C96_C96_mg17" >
+      <grid name="atm">C96</grid>
+      <grid name="lnd">C96</grid>
+      <grid name="ocnice">C96</grid>
+      <mask>gx1v7</mask>
+    </model_grid>
+
+
+    <model_grid alias="C192_C192_mnull" >
+      <grid name="atm">C192</grid>
+      <grid name="lnd">C192</grid>
+      <grid name="ocnice">C192</grid>
+      <mask>null</mask>
+    </model_grid>
+
+    <model_grid alias="C192_C192_mg16" >
+      <grid name="atm">C192</grid>
+      <grid name="lnd">C192</grid>
+      <grid name="ocnice">C192</grid>
+      <mask>gx1v6</mask>
+    </model_grid>
+
+    <model_grid alias="C192_C192_mg17" >
+      <grid name="atm">C192</grid>
+      <grid name="lnd">C192</grid>
+      <grid name="ocnice">C192</grid>
+      <mask>gx1v7</mask>
+    </model_grid>
+
+    <model_grid alias="C384_C384_mnull" >
+      <grid name="atm">C384</grid>
+      <grid name="lnd">C384</grid>
+      <grid name="ocnice">C384</grid>
+      <mask>null</mask>
+    </model_grid>
+
+    <model_grid alias="C384_C384_mg16" >
+      <grid name="atm">C384</grid>
+      <grid name="lnd">C384</grid>
+      <grid name="ocnice">C384</grid>
+      <mask>gx1v6</mask>
+    </model_grid>
+
+    <model_grid alias="C384_C384_mg17" >
+      <grid name="atm">C384</grid>
+      <grid name="lnd">C384</grid>
+      <grid name="ocnice">C384</grid>
+      <mask>gx1v7</mask>
     </model_grid>
 
   </grids>
@@ -1668,10 +1770,45 @@
 
     <!-- fvcubed domains-->
 
+    <domain name="C5">
+      <nx>150</nx> <ny>1</ny>
+      <file grid="atm|lnd" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.lnd.C5_gx1v6.181018.nc</file>
+      <file grid="ocnice" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C5_gx1v6.181018.nc</file>
+      <file grid="atm|lnd" mask="gx1v7">$DIN_LOC_ROOT/share/domains/domain.lnd.C5_gx1v7.181018.nc</file>
+      <file grid="ocnice" mask="gx1v7">$DIN_LOC_ROOT/share/domains/domain.ocn.C5_gx1v7.181018.nc</file>
+      <mesh driver="nuopc">$DIN_LOC_ROOT/share/meshes/C5_181018_ESMFmesh.nc</mesh>
+      <desc>C5 is a fvcubed xx-deg grid:</desc>
+      <support>Experimental for fv3 dycore</support>
+    </domain>
+
+    <domain name="C24">
+      <nx>3456</nx> <ny>1</ny>
+      <file grid="atm|lnd" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.lnd.C24_gx1v6.181018.nc</file>
+      <file grid="ocnice" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C24_gx1v6.181018.nc</file>
+      <file grid="atm|lnd" mask="gx1v7">$DIN_LOC_ROOT/share/domains/domain.lnd.C24_gx1v7.181018.nc</file>
+      <file grid="ocnice" mask="gx1v7">$DIN_LOC_ROOT/share/domains/domain.ocn.C24_gx1v7.181018.nc</file>
+      <mesh driver="nuopc">$DIN_LOC_ROOT/share/meshes/C24_181018_ESMFmesh.nc</mesh>
+      <desc>C24 is a fvcubed xx-deg grid:</desc>
+      <support>Experimental for fv3 dycore</support>
+    </domain>
+
+    <domain name="C48">
+      <nx>13824</nx> <ny>1</ny>
+      <file grid="atm|lnd" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.lnd.C48_gx1v6.181018.nc</file>
+      <file grid="ocnice" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C48_gx1v6.181018.nc</file>
+      <file grid="atm|lnd" mask="gx1v7">$DIN_LOC_ROOT/share/domains/domain.lnd.C48_gx1v7.181018.nc</file>
+      <file grid="ocnice" mask="gx1v7">$DIN_LOC_ROOT/share/domains/domain.ocn.C48_gx1v7.181018.nc</file>
+      <mesh driver="nuopc">$DIN_LOC_ROOT/share/meshes/C48_181018_ESMFmesh.nc</mesh>
+      <desc>C48 is a fvcubed xx-deg grid:</desc>
+      <support>Experimental for fv3 dycore</support>
+    </domain>
+
     <domain name="C96">
       <nx>55296</nx> <ny>1</ny>
       <file grid="atm|lnd" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.lnd.C96_gx1v6.181018.nc</file>
-      <file grid="ocnice"  mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C96_gx1v6.181018.nc</file>
+      <file grid="ocnice" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C96_gx1v6.181018.nc</file>
+      <file grid="atm|lnd" mask="gx1v7">$DIN_LOC_ROOT/share/domains/domain.lnd.C96_gx1v7.181018.nc</file>
+      <file grid="ocnice" mask="gx1v7">$DIN_LOC_ROOT/share/domains/domain.ocn.C96_gx1v7.181018.nc</file>
       <file grid="atm|lnd" mask="tx0.66v1">$DIN_LOC_ROOT/share/domains/domain.lnd.C96_tx0.66v1.181210.nc</file>
       <file grid="ocnice"  mask="tx0.66v1">$DIN_LOC_ROOT/share/domains/domain.ocn.C96_tx0.66v1.181210.nc</file>
       <mesh driver="nuopc">$DIN_LOC_ROOT/share/meshes/C96_181018_ESMFmesh.nc</mesh>
@@ -1679,9 +1816,24 @@
       <support>Experimental for fv3 dycore</support>
     </domain>
 
+    <domain name="C192">
+      <nx>221184</nx> <ny>1</ny>
+      <file grid="atm|lnd" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.lnd.C192_gx1v6.181018..nc</file>
+      <file grid="ocnice" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C192_gx1v6.181018.nc</file>
+      <file grid="atm|lnd" mask="gx1v7">$DIN_LOC_ROOT/share/domains/domain.lnd.C192_gx1v7.181018..nc</file>
+      <file grid="ocnice" mask="gx1v7">$DIN_LOC_ROOT/share/domains/domain.ocn.C192_gx1v7.181018.nc</file>
+      <mesh driver="nuopc">$DIN_LOC_ROOT/share/meshes/C192_181018_ESMFmesh.nc</mesh>
+      <desc>C192 is a fvcubed xx-deg grid:</desc>
+      <support>Experimental for fv3 dycore</support>
+    </domain>
+
     <domain name="C384">
-      <!-- The following nx is incorrect -->
-      <nx>100000</nx> <ny>1</ny>
+      <nx>884736</nx> <ny>1</ny>
+      <file grid="atm|lnd" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.lnd.C384_gx1v6.181018.nc</file>
+      <file grid="ocnice" mask="gx1v6">$DIN_LOC_ROOT/share/domains/domain.ocn.C384_gx1v6.181018.nc</file>
+      <file grid="atm|lnd" mask="gx1v7">$DIN_LOC_ROOT/share/domains/domain.lnd.C384_gx1v7.181018.nc</file>
+      <file grid="ocnice" mask="gx1v7">$DIN_LOC_ROOT/share/domains/domain.ocn.C384_gx1v7.181018.nc</file>
+      <mesh driver="nuopc">$DIN_LOC_ROOT/share/meshes/C384_181018_ESMFmesh.nc</mesh>
       <desc>C384 is a fvcubed xx-deg grid:</desc>
       <support>Experimental for fv3 dycore</support>
     </domain>

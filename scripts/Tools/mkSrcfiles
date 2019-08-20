@@ -9,6 +9,16 @@
 # listed.
 # The list of source files is written to the file Srcfiles.
 
+use Getopt::Std;
+# Process command line.
+my %opt = ();
+getopts( "e:", \%opt )        or usage();
+
+my @exclude_files = ();
+if ( defined $opt{'e'} ) {
+    @exclude_files = split ',', $opt{'e'};
+}
+
 # Check usage:
 @ARGV == 0                 or usage();
 
@@ -49,6 +59,12 @@ foreach $dir (@paths) {
 	$dfile =~ s/\.in//;
 	delete $src{$dfile} if(defined $src{$dfile});
 	$src{$filename} = 1;
+    }
+    # Remove files that have be specified for exclusion
+    foreach $filename (@exclude_files) {
+        if (defined $src{$filename}) {
+            delete $src{$filename};
+        }
     }
 }
 

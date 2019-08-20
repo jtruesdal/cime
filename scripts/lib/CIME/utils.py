@@ -491,7 +491,8 @@ def run_cmd(cmd, input_str=None, from_dir=None, verbose=None,
         if stat != 0:
             logger.info("  stat: {:d}\n".format(stat))
         if output:
-            logger.info("  output: {}\n".format(output))
+#            logger.info("  output: {}\n".format(output))
+            logger.info(output)
         if errput:
             logger.info("  errput: {}\n".format(errput))
 

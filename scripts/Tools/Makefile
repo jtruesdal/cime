@@ -548,6 +548,14 @@ ifeq ($(findstring -cosp,$(CAM_CONFIG_OPTS)),-cosp)
   endif
 endif
 
+CAM_DYCORE ?= $(shell $(CASEROOT)/xmlquery --caseroot $(CASEROOT) CAM_DYCORE --value)
+
+ifeq ($(CAM_DYCORE),fv3)
+FV3CORE_LIBDIR:=$(abspath $(EXEROOT)/atm/obj/atmos_cubed_sphere)
+INCLDIR+=-I$(FV3CORE_LIBDIR) -I$(FV3CORE_LIBDIR)/../ -I../$(INSTALL_SHAREDPATH)/include -I../$(CSM_SHR_INCLUDE) -I$(abspath $(EXEROOT)/FMS) -I$(CIMEROOT)/../libraries/FMS/src/include
+endif
+
+
 ifeq ($(MODEL),cam)
   # These RRTMG files take an extraordinarily long time to compile with optimization.
   # Until mods are made to read the data from files, just remove optimization from
@@ -569,6 +577,12 @@ $(COSP_LIBDIR)/libcosp.a: cam_abortutils.o
 cospsimulator_intr.o: $(COSP_LIBDIR)/libcosp.a
 endif
 
+ifdef FV3CORE_LIBDIR
+$(FV3CORE_LIBDIR)/libfv3core.a: $(EXEROOT)/FMS/libfms.a
+	$(MAKE) -C $(FV3CORE_LIBDIR) complib COMPLIB='$(FV3CORE_LIBDIR)/libfv3core.a' F90='$(FC)' CC='$(CC)' FFLAGS='$(FFLAGS) $(FC_AUTO_R8)'  CFLAGS='$(CFLAGS)' INCLDIR='$(INCLDIR)' FC_TYPE='$(COMPILER)'
+
+dyn_grid.o: $(FV3CORE_LIBDIR)/libfv3core.a
+endif
 endif
 
 
@@ -779,7 +793,7 @@ Deppath: Filepath
 	@echo "$(MINCROOT)" >> $@
 
 Srcfiles: Filepath
-	$(CASETOOLS)/mkSrcfiles
+	$(CASETOOLS)/mkSrcfiles $(USER_MKSRCFILES_OPTS) > $@
 
 Filepath:
 	@echo "$(VPATH)" > $@
@@ -870,6 +884,10 @@ ifdef COSP_LIBDIR
   endif
 endif
 
+ifdef FV3CORE_LIBDIR
+  ULIBDEP += $(FV3CORE_LIBDIR)/libfv3core.a
+  ULIBDEP += $(EXEROOT)/FMS/libfms.a
+endif
 
 ifndef CLIBS
    ifdef ULIBDEP
