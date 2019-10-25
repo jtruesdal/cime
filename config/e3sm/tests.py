@@ -40,9 +40,9 @@ _TESTS = {
             "ERP_Ln9.ne4_ne4.FC5AV1C-L",
             "SMS_Ln9.ne4_ne4.FC5AV1C-L.cam-outfrq9s",
             "SMS.ne4_ne4.FC5AV1C-L.cam-cosplite",
-            "SMS_R_Ld5.T42_T42.FSCM5A97",
             "SMS_R_Ld5.ne4_ne4.FSCM5A97",
             "SMS_D_Ln5.ne4_ne4.FC5AV1C-L",
+            "SMS_Ln5.ne4pg2_ne4pg2.FC5AV1C-L",
             )
         },
 
@@ -88,6 +88,7 @@ _TESTS = {
         "tests" : (
             "PGN_P1x1.ne4_ne4.FC5AV1C-L",
             "TSC.ne4_ne4.FC5AV1C-L",
+            "MVK_PL.ne4_ne4.FC5AV1C-L",
             )
         },
 
@@ -217,6 +218,8 @@ _TESTS = {
                  "SMS.ne4_ne4.FC5AV1C-L.cam-thetanh_ftype2",
                  "SMS.ne4_ne4.FC5AV1C-L.cam-thetanh_ftype4",
                  "SMS.ne4_ne4.FC5AV1C-L.cam-thetahy_sl",
+                 "ERS.ne4_ne4.FC5AV1C-L.cam-thetahy_ftype2",
+                 "ERS.ne4_ne4.FC5AV1C-L.cam-thetanh_ftype2",
                  )
     },
 
