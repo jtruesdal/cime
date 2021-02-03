@@ -70,7 +70,7 @@ using a fortran linker.
 <compiler>
   <CPPDEFS>
     <!-- This should be removed AFTER MOM6 cap is fully unified -->
-    <append> -DCESMCOUPLED </append>
+    <!-- <append> -DCESMCOUPLED </append> -->
     <append MODEL="pop"> -D_USE_FLOW_CONTROL </append>
     <append MODEL="ufsatm"> -DSPMD </append>
   </CPPDEFS>
@@ -580,5 +580,11 @@ using a fortran linker.
   </SLIBS>
   <TRILINOS_PATH>$ENV{TRILINOS_PATH}</TRILINOS_PATH>
   <HAS_F2008_CONTIGUOUS>FALSE</HAS_F2008_CONTIGUOUS>
+</compiler>
+
+<compiler>
+  <FFLAGS>
+    <append MODEL="hycom">$(FC_AUTO_R8)</append>
+  </FFLAGS>
 </compiler>
 </config_compilers>

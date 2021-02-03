@@ -24,7 +24,7 @@ _var_ref_re = re.compile(r"\$(\{)?(?P<name>\w+)(?(1)\})")
 
 _ymd_re = re.compile(r"%(?P<digits>[1-9][0-9]*)?y(?P<month>m(?P<day>d)?)?")
 
-_stream_file_template = """<?xml version="1.0"?>
+_stream_mct_file_template = """<?xml version="1.0"?>
 <file id="stream" version="1.0">
 <dataSource>
    GENERIC
@@ -90,6 +90,10 @@ class NamelistGenerator(object):
         # Create namelist object.
         self._namelist = Namelist()
 
+        # entries for which we should potentially call add_default (variables that do not
+        # set skip_default_entry)
+        self._default_nodes = []
+
     # Define __enter__ and __exit__ so that we can use this as a context manager
     def __enter__(self):
         return self
@@ -97,16 +101,25 @@ class NamelistGenerator(object):
     def __exit__(self, *_):
         return False
 
-    def init_defaults(self, infiles, config, skip_groups=None, skip_entry_loop=False):
+    def init_defaults(self, infiles, config, skip_groups=None, skip_entry_loop=False,
+                      skip_default_for_groups=None):
         """Return array of names of all definition nodes
+
+        If skip_default_for_groups is provided, it should be a list of namelist group
+        names; the add_default call will not be done for any variables in these
+        groups. This is often paired with later conditional calls to
+        add_defaults_for_group.
         """
+        if skip_default_for_groups is None:
+            skip_default_for_groups = []
+
         # first clean out any settings left over from previous calls
         self.new_instance()
 
         self._definition.set_nodes(skip_groups=skip_groups)
 
         # Determine the array of entry nodes that will be acted upon
-        entry_nodes = self._definition.set_nodes(skip_groups=skip_groups)
+        self._default_nodes = self._definition.set_nodes(skip_groups=skip_groups)
 
         # Add attributes to definition object
         self._definition.add_attributes(config)
@@ -128,10 +141,47 @@ class NamelistGenerator(object):
             self._namelist.merge_nl(new_namelist)
 
         if not skip_entry_loop:
-            for entry in entry_nodes:
+            for entry in self._default_nodes:
+                group_name = self._definition.get_group_name(entry)
+                if not group_name in skip_default_for_groups:
+                    self.add_default(self._definition.get(entry, "id"))
+
+        return [self._definition.get(entry, "id") for entry in self._default_nodes]
+
+    def add_defaults_for_group(self, group):
+        """Call add_default for namelist variables in the given group
+
+        This still skips variables that have attributes of skip_default_entry or
+        per_stream_entry.
+
+        This must be called after init_defaults. It is often paired with use of
+        skip_default_for_groups in the init_defaults call.
+        """
+        for entry in self._default_nodes:
+            group_name = self._definition.get_group_name(entry)
+            if group_name == group:
                 self.add_default(self._definition.get(entry, "id"))
 
-        return [self._definition.get(entry, "id") for entry in entry_nodes]
+    def confirm_group_is_empty(self, group_name, errmsg):
+        """Confirms that no values have been added to the given group
+
+        If any values HAVE been added to this group, aborts with the given error message.
+
+        This is often paired with use of skip_default_for_groups in the init_defaults call
+        and add_defaults_for_group, as in:
+
+            if nmlgen.get_value("enable_frac_overrides") == ".true.":
+                nmlgen.add_defaults_for_group("glc_override_nml")
+            else:
+                nmlgen.confirm_empty("glc_override_nml", "some message")
+
+        Args:
+        group_name: string - name of namelist group
+        errmsg: string - error message to print if group is not empty
+        """
+        variables_in_group = self._namelist.get_variable_names(group_name)
+        fullmsg = "{}\nOffending variables: {}".format(errmsg, variables_in_group)
+        expect(len(variables_in_group) == 0, fullmsg)
 
     @staticmethod
     def quote_string(string):
@@ -147,7 +197,7 @@ class NamelistGenerator(object):
     def _to_python_value(self, name, literals):
         """Transform a literal list as needed for `get_value`."""
         var_type, _, var_size, = self._definition.split_type_string(name)
-        if len(literals) > 0:
+        if len(literals) > 0 and literals[0] is not None:
             values = expand_literal_list(literals)
         else:
             return ""
@@ -222,7 +272,8 @@ class NamelistGenerator(object):
         var_group = self._definition.get_group(name)
         literals = self._to_namelist_literals(name, value)
         _, _, var_size, = self._definition.split_type_string(name)
-        self._namelist.set_variable_value(var_group, name, literals, var_size)
+        if len(literals) > 0 and literals[0] is not None:
+            self._namelist.set_variable_value(var_group, name, literals, var_size)
 
     def get_default(self, name, config=None, allow_none=False):
         """Get the value of a variable from the namelist definition file.
@@ -269,10 +320,14 @@ class NamelistGenerator(object):
             match = _var_ref_re.search(scalar)
             while match:
                 env_val = self._case.get_value(match.group('name'))
-                expect(env_val is not None,
-                       "Namelist default for variable {} refers to unknown XML variable {}.".format(name, match.group('name')))
-                scalar = scalar.replace(match.group(0), str(env_val), 1)
-                match = _var_ref_re.search(scalar)
+                if env_val is not None:
+                    scalar = scalar.replace(match.group(0), str(env_val), 1)
+                    match = _var_ref_re.search(scalar)
+                else:
+                    scalar = None
+                    logger.warning("Namelist default for variable {} refers to unknown XML variable {}.".
+                       format(name, match.group('name')))
+                    match = None
             default[i] = scalar
 
         # Deal with missing quotes.
@@ -416,6 +471,16 @@ class NamelistGenerator(object):
                     new_lines.append(new_line)
         return "\n".join(new_lines)
 
+    @staticmethod
+    def _add_xml_delimiter(list_to_deliminate, delimiter):
+        expect(delimiter and not " " in delimiter, "Missing or badly formed delimiter")
+        pred = "<{}>".format(delimiter)
+        postd = "</{}>".format(delimiter)
+        for n,_ in enumerate(list_to_deliminate):
+            list_to_deliminate[n] = pred + list_to_deliminate[n].strip() + postd
+        return "\n      ".join(list_to_deliminate)
+
+
     def create_stream_file_and_update_shr_strdata_nml(self, config, caseroot, #pylint:disable=too-many-locals
                            stream, stream_path, data_list_path):
         """Write the pseudo-XML file corresponding to a given stream.
@@ -474,7 +539,7 @@ class NamelistGenerator(object):
                 domain_filepath = data_filepath
                 domain_filenames = data_filenames.splitlines()[0]
 
-            stream_file_text = _stream_file_template.format(
+            stream_file_text = _stream_mct_file_template.format(
                 domain_varnames=domain_varnames,
                 domain_filepath=domain_filepath,
                 domain_filenames=domain_filenames,
@@ -594,7 +659,7 @@ class NamelistGenerator(object):
                     # NOTE - these are hard-coded here and a better way is to make these extensible
                     if file_path == 'UNSET' or file_path == 'idmap' or file_path == 'idmap_ignore' or file_path == 'unset':
                         continue
-                    if file_path == 'null':
+                    if file_path in ('null','create_mesh'):
                         continue
                     file_path = self.set_abs_file_path(file_path)
                     if not os.path.exists(file_path):
@@ -713,13 +778,12 @@ class NamelistGenerator(object):
         """ Write nuopc component modelio files"""
         self._namelist.write(filename, groups=["pio_inparm"], format_="nml")
 
-    def write_nuopc_config_file(self, filename, data_list_path=None ):
+    def write_nuopc_config_file(self, filename, data_list_path=None, sorted_groups=False):
         """ Write the nuopc config file"""
         self._definition.validate(self._namelist)
         groups = self._namelist.get_group_names()
-        # write the config file 
-        self._namelist.write_nuopc(filename, groups=groups, sorted_groups=False)
-
+        # write the config file
+        self._namelist.write_nuopc(filename, groups=groups, sorted_groups=sorted_groups)
         # append to input_data_list file
         if data_list_path is not None:
             self._write_input_files(data_list_path)

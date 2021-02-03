@@ -273,14 +273,24 @@ def get_cime_default_driver():
     expect(driver in ("mct", "nuopc", "moab"),"Attempt to set invalid driver {}".format(driver))
     return driver
 
+def get_all_cime_models():
+    modelsroot = os.path.join(get_cime_root(), "config")
+    models = []
+    for entry in os.listdir(modelsroot):
+        if os.path.isdir(os.path.join(modelsroot,entry)):
+            models.append(entry)
+    models.remove('xml_schemas')
+    return models
+
 def set_model(model):
     """
     Set the model to be used in this session
     """
     cime_config = get_cime_config()
+    cime_models = get_all_cime_models()
     if not cime_config.has_section('main'):
         cime_config.add_section('main')
-    expect(model in ['cesm','e3sm','ufs'],"model {} not recognized".format(model))
+    expect(model in cime_models,"model {} not recognized. The acceptable values of CIME_MODEL currently are {}".format(model, cime_models))
     cime_config.set('main','CIME_MODEL',model)
 
 def get_model():
@@ -304,10 +314,11 @@ def get_model():
     >>> reset_cime_config()
     """
     model = os.environ.get("CIME_MODEL")
-    if model in ['cesm', 'e3sm', 'ufs']:
+    cime_models = get_all_cime_models()
+    if model in cime_models:
         logger.debug("Setting CIME_MODEL={} from environment".format(model))
     else:
-        expect(model is None,"model {} not recognized".format(model))
+        expect(model is None,"model {} not recognized. The acceptable values of CIME_MODEL currently are {}".format(model, cime_models))
         cime_config = get_cime_config()
         if (cime_config.has_option('main','CIME_MODEL')):
             model = cime_config.get('main','CIME_MODEL')
@@ -325,7 +336,7 @@ def get_model():
             model = 'cesm'
             with open(os.path.join(srcroot, "Externals.cfg")) as fd:
                 for line in fd:
-                    if re.search('fv3gfs', line):
+                    if re.search('ufs', line):
                         model = 'ufs'
         else:
             model = 'e3sm'
@@ -356,6 +367,19 @@ def _convert_to_fd(filearg, from_dir, mode="a"):
     return open(filearg, mode)
 
 _hack=object()
+
+def check_for_python(filepath, funcname=None):
+    is_python = is_python_executable(filepath)
+    has_function = True
+    if funcname is not None:
+        has_function = False
+        with open(filepath, 'r') as fd:
+            for line in fd.readlines():
+                if re.search(r"^def\s+{}\(".format(funcname), line) or re.search(r"^from.+import.+\s{}".format(funcname), line):
+                    has_function = True
+                    break
+
+    return is_python and has_function
 
 def run_sub_or_cmd(cmd, cmdargs, subname, subargs, logfile=None, case=None,
                    from_dir=None, timeout=None):
@@ -434,7 +458,7 @@ def run_sub_or_cmd(cmd, cmdargs, subname, subargs, logfile=None, case=None,
 
 def run_cmd(cmd, input_str=None, from_dir=None, verbose=None,
             arg_stdout=_hack, arg_stderr=_hack, env=None,
-            combine_output=False, timeout=None):
+            combine_output=False, timeout=None, executable=None):
     """
     Wrapper around subprocess to make it much more convenient to run shell commands
 
@@ -469,6 +493,7 @@ def run_cmd(cmd, input_str=None, from_dir=None, verbose=None,
                                     stderr=arg_stderr,
                                     stdin=stdin,
                                     cwd=from_dir,
+                                    executable=executable,
                                     env=env)
 
             output, errput = proc.communicate(input_str)
@@ -479,6 +504,7 @@ def run_cmd(cmd, input_str=None, from_dir=None, verbose=None,
                                 stderr=arg_stderr,
                                 stdin=stdin,
                                 cwd=from_dir,
+                                executable=executable,
                                 env=env)
 
         output, errput = proc.communicate(input_str)
@@ -530,7 +556,7 @@ def run_cmd(cmd, input_str=None, from_dir=None, verbose=None,
 
 def run_cmd_no_fail(cmd, input_str=None, from_dir=None, verbose=None,
                     arg_stdout=_hack, arg_stderr=_hack, env=None,
-                    combine_output=False, timeout=None):
+                    combine_output=False, timeout=None, executable=None):
     """
     Wrapper around subprocess to make it much more convenient to run shell commands.
     Expects command to work. Just returns output string.
@@ -548,7 +574,8 @@ def run_cmd_no_fail(cmd, input_str=None, from_dir=None, verbose=None,
     True
     """
     stat, output, errput = run_cmd(cmd, input_str, from_dir, verbose, arg_stdout,
-                                   arg_stderr, env, combine_output, timeout=timeout)
+                                   arg_stderr, env, combine_output,
+                                   executable=executable, timeout=timeout)
     if stat != 0:
         # If command produced no errput, put output in the exception since we
         # have nothing else to go on.
@@ -837,6 +864,18 @@ def match_any(item, re_list):
             return True
 
     return False
+
+def get_current_submodule_status(recursive=False, repo=None):
+    """
+    Return the sha1s of the current currently checked out commit for each submodule,
+    along with the submodule path and the output of git describe for the SHA-1.
+
+    >>> get_current_submodule_status() is not None
+    True
+    """
+    rc, output, _ = run_cmd("git submodule status {}".format("--recursive" if recursive else ""), from_dir=repo)
+
+    return output if rc == 0 else "unknown"
 
 def safe_copy(src_path, tgt_path, preserve_meta=True):
     """

@@ -93,6 +93,7 @@ class Case(object):
         self._env_entryid_files = []
         self._env_generic_files = []
         self._files = []
+        self._comp_interface = None
 
         self.read_xml()
 
@@ -126,6 +127,8 @@ class Case(object):
         self.tasks_per_numa = None
         self.cores_per_task = None
         self.srun_binding = None
+        self.async_io = False
+        self.iotasks = 0
 
         # check if case has been configured and if so initialize derived
         if self.get_value("CASEROOT") is not None:
@@ -149,6 +152,9 @@ class Case(object):
         env_mach_spec = self.get_env('mach_specific')
         comp_classes  = self.get_values("COMP_CLASSES")
         max_mpitasks_per_node  = self.get_value("MAX_MPITASKS_PER_NODE")
+        self.async_io = self.get_value("PIO_ASYNC_INTERFACE")
+        if self.async_io:
+            self.iotasks = max(1,self.get_value("PIO_NUMTASKS_CPL"))
 
         self.thread_count = env_mach_pes.get_max_thread_count(comp_classes)
 
@@ -165,7 +171,7 @@ class Case(object):
             self.spare_nodes = env_mach_pes.get_spare_nodes(self.num_nodes)
             self.num_nodes += self.spare_nodes
         else:
-            self.total_tasks = env_mach_pes.get_total_tasks(comp_classes)
+            self.total_tasks = env_mach_pes.get_total_tasks(comp_classes) + self.iotasks
             self.tasks_per_node = env_mach_pes.get_tasks_per_node(self.total_tasks, self.thread_count)
 
             self.num_nodes, self.spare_nodes = env_mach_pes.get_total_nodes(self.total_tasks, self.thread_count)
@@ -182,7 +188,8 @@ class Case(object):
 
         os.environ["OMP_NUM_THREADS"] = str(self.thread_count)
 
-        self.srun_binding = smt_factor*max_mpitasks_per_node / self.tasks_per_node
+        self.srun_binding = math.floor(smt_factor*max_mpitasks_per_node / self.tasks_per_node)
+        self.srun_binding = max(1,self.srun_binding)
 
     # Define __enter__ and __exit__ so that we can use this as a context manager
     # and force a flush on exit.
@@ -205,14 +212,18 @@ class Case(object):
         components = self._env_entryid_files[0].get_values("COMP_CLASSES")
         self._env_entryid_files.append(EnvRun(self._caseroot, components=components, read_only=self._force_read_only))
         self._env_entryid_files.append(EnvBuild(self._caseroot, components=components, read_only=self._force_read_only))
-        self._env_entryid_files.append(EnvMachPes(self._caseroot, components=components, read_only=self._force_read_only))
+        self._comp_interface = self._env_entryid_files[-1].get_value("COMP_INTERFACE")
+
+        self._env_entryid_files.append(EnvMachPes(self._caseroot, components=components, read_only=self._force_read_only,
+                                                  comp_interface=self._comp_interface))
         self._env_entryid_files.append(EnvBatch(self._caseroot, read_only=self._force_read_only))
         self._env_entryid_files.append(EnvWorkflow(self._caseroot, read_only=self._force_read_only))
 
         if os.path.isfile(os.path.join(self._caseroot,"env_test.xml")):
             self._env_entryid_files.append(EnvTest(self._caseroot, components=components, read_only=self._force_read_only))
         self._env_generic_files = []
-        self._env_generic_files.append(EnvMachSpecific(self._caseroot, read_only=self._force_read_only))
+        self._env_generic_files.append(EnvMachSpecific(self._caseroot, read_only=self._force_read_only,
+                                                       comp_interface=self._comp_interface))
         self._env_generic_files.append(EnvArchive(self._caseroot, read_only=self._force_read_only))
         self._files = self._env_entryid_files + self._env_generic_files
 
@@ -266,6 +277,7 @@ class Case(object):
         if not os.path.isdir(self._caseroot):
             # do not flush if caseroot wasnt created
             return
+
         for env_file in self._files:
             env_file.write(force_write=flushall)
 
@@ -440,7 +452,7 @@ class Case(object):
             if result is not None:
                 del self.lookups[key]
 
-    def _set_compset(self, compset_name, files, driver="mct"):
+    def _set_compset(self, compset_name, files):
         """
         Loop through all the compset files and find the compset
         specifation file that matches either the input 'compset_name'.
@@ -457,9 +469,17 @@ class Case(object):
         components = files.get_components("COMPSETS_SPEC_FILE")
         logger.debug(" Possible components for COMPSETS_SPEC_FILE are {}".format(components))
 
-        self.set_lookup_value("COMP_INTERFACE", driver)
-        if self._cime_model == 'cesm':
+        self.set_lookup_value("COMP_INTERFACE", self._comp_interface)
+        if self._cime_model == 'ufs':
+            ufs_driver = os.environ.get("UFS_DRIVER")
+            attribute = None
+            if ufs_driver:
+                attribute = {"component":"nems"}
+            comp_root_dir_cpl = files.get_value("COMP_ROOT_DIR_CPL", attribute=attribute)
+        elif self._cime_model == 'cesm':
             comp_root_dir_cpl = files.get_value("COMP_ROOT_DIR_CPL")
+
+        if self._cime_model in ('cesm','ufs'):
             self.set_lookup_value("COMP_ROOT_DIR_CPL",comp_root_dir_cpl)
 
         # Loop through all of the files listed in COMPSETS_SPEC_FILE and find the file
@@ -485,6 +505,7 @@ class Case(object):
 
         # Fill in compset name
         self._compsetname, self._components = self.valid_compset(self._compsetname, compset_alias, files)
+
         # if this is a valiid compset longname there will be at least 7 components.
         components = self.get_compset_components()
         expect(len(components) > 6, "No compset alias {} found and this does not appear to be a compset longname.".format(compset_name))
@@ -519,6 +540,9 @@ class Case(object):
             primary_component = "allactive"
         elif progcomps["LND"] and progcomps["OCN"] and progcomps["ICE"]:
             # this is a "J" compset
+            primary_component = "allactive"
+        elif progcomps["ATM"] and progcomps["OCN"] and progcomps["ICE"]:
+            # this is a ufs s2s compset
             primary_component = "allactive"
         elif progcomps["ATM"]:
             if "DOCN%SOM" in self._compsetname and progcomps["LND"]:
@@ -614,6 +638,7 @@ class Case(object):
     # is handled consistenly, this should not affect functionality.
     # Note: interstitial digits are included (e.g., in FV3GFS).
     __mod_match_re__ = re.compile(r"([^%]*[^0-9%]+)")
+
     def valid_compset(self, compset_name, compset_alias, files):
         """Add stub models missing in <compset_name>, return full compset name.
         <files> is used to collect set of all supported components.
@@ -716,7 +741,7 @@ class Case(object):
         for env_file in self._env_entryid_files:
             env_file.set_components(comp_classes)
 
-    def _get_component_config_data(self, files, driver=None):
+    def _get_component_config_data(self, files):
         # attributes used for multi valued defaults
         # attlist is a dictionary used to determine the value element that has the most matches
         attlist = {"compset":self._compsetname, "grid":self._gridname, "cime_model":self._cime_model}
@@ -735,7 +760,7 @@ class Case(object):
 
         drv_config_file_model_specific = files.get_value("CONFIG_CPL_FILE_MODEL_SPECIFIC")
         expect(os.path.isfile(drv_config_file_model_specific),
-               "No {} specific file found for driver {}".format(get_model(),driver))
+               "No {} specific file found for driver {}".format(get_model(),self._comp_interface))
         drv_comp_model_specific = Component(drv_config_file_model_specific, 'CPL')
 
         self._component_description["forcing"] = drv_comp_model_specific.get_forcing_description(self._compsetname)
@@ -754,7 +779,7 @@ class Case(object):
 
         # will need a change here for new cpl components
         root_dir_node_name = 'COMP_ROOT_DIR_CPL'
-        comp_root_dir = files.get_value(root_dir_node_name, {"component":driver}, resolved=False)
+        comp_root_dir = files.get_value(root_dir_node_name, {"component":self._comp_interface}, resolved=False)
 
         if comp_root_dir is not None:
             self.set_value(root_dir_node_name, comp_root_dir)
@@ -764,16 +789,18 @@ class Case(object):
             comp_name  = self._components[i-1]
             root_dir_node_name = 'COMP_ROOT_DIR_' + comp_class
             node_name = 'CONFIG_' + comp_class + '_FILE'
-            comp_root_dir = files.get_value(root_dir_node_name, {"component":comp_name}, resolved=False)
+            compatt = {"component":comp_name}
+            comp_root_dir = files.get_value(root_dir_node_name, compatt, resolved=False)
             if comp_root_dir is not None:
                 self.set_value(root_dir_node_name, comp_root_dir)
 
-            compatt = {"component":comp_name}
             # Add the group and elements for the config_files.xml
+
             comp_config_file = files.get_value(node_name, compatt, resolved=False)
             expect(comp_config_file is not None,"No component {} found for class {}".format(comp_name, comp_class))
             self.set_value(node_name, comp_config_file)
             comp_config_file =  files.get_value(node_name, compatt)
+
             expect(comp_config_file is not None and os.path.isfile(comp_config_file),
                    "Config file {} for component {} not found.".format(comp_config_file, comp_name))
             compobj = Component(comp_config_file, comp_class)
@@ -785,7 +812,7 @@ class Case(object):
             logger.info("{} component is {}".format(comp_class, self._component_description[comp_class]))
             for env_file in self._env_entryid_files:
                 env_file.add_elements_by_group(compobj, attributes=attlist)
-        self.clean_up_lookups(allow_undefined=driver=='nuopc')
+        self.clean_up_lookups(allow_undefined=self._comp_interface=='nuopc')
 
     def _setup_mach_pes(self, pecount, multi_driver, ninst, machine_name, mpilib):
         #--------------------------------------------
@@ -797,7 +824,7 @@ class Case(object):
         ftype = gfile.get_id()
         expect(ftype == "env_mach_pes.xml" or ftype == "config_pes", " Do not recognize {} as a valid CIME pes file {}".format(self._pesfile, ftype))
         if ftype == "env_mach_pes.xml":
-            new_mach_pes_obj = EnvMachPes(infile=self._pesfile, components=self._component_classes)
+            new_mach_pes_obj = EnvMachPes(infile=self._pesfile, components=self._component_classes, comp_interface=self._comp_interface)
             self.update_env(new_mach_pes_obj, "mach_pes", blow_away=True)
             return new_mach_pes_obj.get_value("TOTALPES")
 
@@ -848,7 +875,8 @@ class Case(object):
         mach_pes_obj.add_comment(comment)
 
         if other is not None:
-            for key, value in other.items():
+            logger.info("setting additional fields from config_pes: {}".format(other))
+            for key, value in list(other.items()):
                 self.set_value(key, value)
 
         totaltasks = []
@@ -870,9 +898,6 @@ class Case(object):
             mach_pes_obj.set_value(rootpe_str, rootpe)
             mach_pes_obj.set_value(pstrid_str, pstrid)
 
-        if multi_driver:
-            mach_pes_obj.set_value("MULTI_DRIVER", True)
-
         # Make sure that every component has been accounted for
         # set, nthrds and ntasks to 1 otherwise. Also set the ninst values here.
         for compclass in self._component_classes:
@@ -887,6 +912,9 @@ class Case(object):
             key = "NTHRDS_{}".format(compclass)
             if compclass not in pes_nthrds:
                 mach_pes_obj.set_value(compclass,1)
+        if multi_driver:
+            mach_pes_obj.set_value("MULTI_DRIVER", True)
+
 
     def configure(self, compset_name, grid_name, machine_name=None,
                   project=None, pecount=None, compiler=None, mpilib=None,
@@ -899,15 +927,17 @@ class Case(object):
 
         expect(check_name(compset_name, additional_chars='.'), "Invalid compset name {}".format(compset_name))
 
+        self._comp_interface = driver
         #--------------------------------------------
         # compset, pesfile, and compset components
         #--------------------------------------------
-        files = Files(comp_interface=driver)
+        files = Files(comp_interface=self._comp_interface)
 
         #--------------------------------------------
         # find and/or fill out compset name
         #--------------------------------------------
-        compset_alias, science_support = self._set_compset(compset_name, files, driver)
+
+        compset_alias, science_support = self._set_compset(compset_name, files)
 
         self._components = self.get_compset_components()
 
@@ -916,17 +946,17 @@ class Case(object):
         #--------------------------------------------
         grids = Grids(gridfile)
 
-        gridinfo = grids.get_grid_info(name=grid_name, compset=self._compsetname, driver=driver)
-
+        gridinfo = grids.get_grid_info(name=grid_name, compset=self._compsetname, driver=self._comp_interface)
         self._gridname = gridinfo["GRID"]
-        for key,value in gridinfo.items():
+        for key,value in list(gridinfo.items()):
             logger.debug("Set grid {} {}".format(key,value))
             self.set_lookup_value(key,value)
 
         #--------------------------------------------
         # component config data
         #--------------------------------------------
-        self._get_component_config_data(files, driver=driver)
+
+        self._get_component_config_data(files)
 
         # This needs to be called after self.set_comp_classes, which is called
         # from self._get_component_config_data
@@ -958,14 +988,16 @@ class Case(object):
         nodenames = machobj.get_node_names()
         nodenames = [x for x in nodenames if
                      '_system' not in x and '_variables' not in x and 'mpirun' not in x and\
-                     'COMPILER' not in x and 'MPILIB' not in x]
+                     'COMPILER' not in x and 'MPILIB' not in x and 'MAX_MPITASKS_PER_NODE' not in x and\
+                     'MAX_TASKS_PER_NODE' not in x]
 
         for nodename in nodenames:
             value = machobj.get_value(nodename, resolved=False)
-            type_str = self.get_type_info(nodename)
-            if type_str is not None:
-                logger.debug("machine nodname {} value {}".format(nodename, value))
-                self.set_value(nodename, convert_to_type(value, type_str, nodename))
+            if value:
+                type_str = self.get_type_info(nodename)
+                if type_str is not None:
+                    logger.debug("machine nodename {} value {}".format(nodename, value))
+                    self.set_value(nodename, convert_to_type(value, type_str, nodename))
 
         if compiler is None:
             compiler = machobj.get_default_compiler()
@@ -981,17 +1013,22 @@ class Case(object):
             expect(machobj.is_valid_MPIlib(mpilib, {"compiler":compiler}),
                    "MPIlib {} is not supported on machine {}".format(mpilib, machine_name))
         self.set_value("MPILIB",mpilib)
+        for name in ("MAX_TASKS_PER_NODE","MAX_MPITASKS_PER_NODE"):
+            dmax = machobj.get_value(name,{'compiler':compiler})
+            if not dmax:
+                dmax = machobj.get_value(name)
+            self.set_value(name, dmax)
 
         machdir = machobj.get_machines_dir()
         self.set_value("MACHDIR", machdir)
 
         # Create env_mach_specific settings from machine info.
         env_mach_specific_obj = self.get_env("mach_specific")
-        env_mach_specific_obj.populate(machobj)
+        env_mach_specific_obj.populate(machobj, attributes={"mpilib":mpilib, "compiler":compiler,"threaded":self.get_build_threaded()})
 
         self._setup_mach_pes(pecount, multi_driver, ninst, machine_name, mpilib)
 
-        if multi_driver and ninst>1:
+        if multi_driver and int(ninst)>1:
             logger.info(" Driver/Coupler has %s instances" % ninst)
 
         #--------------------------------------------
@@ -1082,14 +1119,17 @@ class Case(object):
         env_batch = self.get_env("batch")
 
         batch_system_type = machobj.get_value("BATCH_SYSTEM")
+
         logger.info("Batch_system_type is {}".format(batch_system_type))
         batch = Batch(batch_system=batch_system_type, machine=machine_name, files=files,
                       extra_machines_dir=extra_machines_dir)
+
         workflow = Workflow(files=files)
-        bjobs = workflow.get_workflow_jobs(machine=machine_name, workflowid=workflowid)
-        env_workflow = self.get_env("workflow")
 
         env_batch.set_batch_system(batch, batch_system_type=batch_system_type)
+
+        bjobs = workflow.get_workflow_jobs(machine=machine_name, workflowid=workflowid)
+        env_workflow = self.get_env("workflow")
         env_workflow.create_job_groups(bjobs, test)
 
         if walltime:
@@ -1129,15 +1169,16 @@ class Case(object):
         return batchobj.get_jobs()
 
     def _set_pio_xml(self):
-        pioobj = PIO()
+        pioobj = PIO(self._component_classes)
         grid = self.get_value("GRID")
         compiler = self.get_value("COMPILER")
         mach = self.get_value("MACH")
         compset = self.get_value("COMPSET")
         mpilib = self.get_value("MPILIB")
-        defaults = pioobj.get_defaults(grid=grid,compset=compset,mach=mach,compiler=compiler, mpilib=mpilib)
 
-        for vid, value in defaults.items():
+        defaults = pioobj.get_defaults(grid=grid, compset=compset, mach=mach, compiler=compiler, mpilib=mpilib)
+
+        for vid, value in list(defaults.items()):
             self.set_value(vid,value)
 
     def _create_caseroot_tools(self):
@@ -1191,6 +1232,8 @@ class Case(object):
                 safe_copy(os.path.join(machines_dir, "syslog.{}".format(machine)), os.path.join(casetools, "mach_syslog"))
             else:
                 safe_copy(os.path.join(machines_dir, "syslog.noop"), os.path.join(casetools, "mach_syslog"))
+
+            safe_copy(os.path.join(toolsdir, "e3sm_compile_wrap.py"), casetools)
 
         # add archive_metadata to the CASEROOT but only for CESM
         if get_model() == "cesm":
@@ -1374,7 +1417,7 @@ directory, NOT in this subdirectory."""
         if not jobmap:
             logger.info("No job ids associated with this case. Either case.submit was not run or was run with no-batch")
         else:
-            for jobname, jobid in jobmap.items():
+            for jobname, jobid in list(jobmap.items()):
                 status = self.get_env("batch").get_status(jobid)
                 if status:
                     logger.info("{}: {}".format(jobname, status))
@@ -1407,7 +1450,8 @@ directory, NOT in this subdirectory."""
             "mpilib"   : self.get_value("MPILIB"),
             "threaded" : self.get_build_threaded(),
             "queue" : self.get_value("JOB_QUEUE", subgroup=job),
-            "unit_testing" : False
+            "unit_testing" : False,
+            "comp_interface" : self._comp_interface
             }
 
         executable, mpi_arg_list, custom_run_exe, custom_run_misc_suffix = env_mach_specific.get_mpirun(self, mpi_attribs, job)
@@ -1459,6 +1503,8 @@ directory, NOT in this subdirectory."""
         Returns True if current settings require a threaded build/run.
         """
         force_threaded = self.get_value("FORCE_BUILD_SMP")
+        if not self.thread_count:
+            return False
         smp_present = force_threaded or self.thread_count > 1
         return smp_present
 
@@ -1483,9 +1529,9 @@ directory, NOT in this subdirectory."""
             #   called if run_unsupported is False.
             tests = Testlist(tests_spec_file, files)
             testlist = tests.get_tests(compset=compset_alias, grid=grid_name, supported_only=True)
-            test_categories = ["prealpha", "prebeta", "test_release", "aux_"]
+            test_categories = ["prealpha", "prebeta", "test_release"]
             for test in testlist:
-                if test["category"] in test_categories \
+                if test["category"] in test_categories or "aux_" in test["category"] \
                    or get_cime_default_driver() in test["category"]:
                     testcnt += 1
         if testcnt > 0:
@@ -1521,7 +1567,7 @@ directory, NOT in this subdirectory."""
                 elif ftype == "env_case.xml":
                     new_env_file = EnvCase(infile=xmlfile, components=components)
                 elif ftype == "env_mach_pes.xml":
-                    new_env_file = EnvMachPes(infile=xmlfile, components=components)
+                    new_env_file = EnvMachPes(infile=xmlfile, components=components, comp_interface=self._comp_interface)
                 elif ftype == "env_batch.xml":
                     new_env_file = EnvBatch(infile=xmlfile)
                 elif ftype == "env_workflow.xml":
@@ -1531,7 +1577,7 @@ directory, NOT in this subdirectory."""
                 elif ftype == "env_archive.xml":
                     new_env_file = EnvArchive(infile=xmlfile)
                 elif ftype == "env_mach_specific.xml":
-                    new_env_file = EnvMachSpecific(infile=xmlfile)
+                    new_env_file = EnvMachSpecific(infile=xmlfile, comp_interface=self._comp_interface)
                 else:
                     expect(False, "No match found for file type {}".format(ftype))
 
@@ -1595,6 +1641,16 @@ directory, NOT in this subdirectory."""
             self.set_lookup_value("CASE", os.path.basename(casename))
             self.set_lookup_value("CASEROOT", self._caseroot)
             self.set_lookup_value("SRCROOT", srcroot)
+            # if the top level user_mods_dir contains a config_grids.xml file and
+            # gridfile was not set on the command line, use it.
+            if user_mods_dir:
+                um_config_grids = os.path.join(user_mods_dir,"config_grids.xml")
+                if os.path.exists(um_config_grids):
+                    if gridfile:
+                        logger.warning("A config_grids file was found in {} but also provided on the command line {}, command line takes precident".format(um_config_grids, gridfile))
+                    else:
+                        gridfile = um_config_grids
+
 
             # Configure the Case
             self.configure(compset_name, grid_name, machine_name=machine_name,

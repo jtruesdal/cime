@@ -82,7 +82,11 @@ def buildlib(bldroot, installpath, case):
     if not os.path.isdir(pio_dir):
         os.makedirs(pio_dir)
     casetools = case.get_value("CASETOOLS")
-    cmake_opts = "\"-D GENF90_PATH=$CIMEROOT/src/externals/genf90 \""
+    if pio_version == 1 or scorpio_src_root_dir:
+        cmake_opts = "\"-D GENF90_PATH=$CIMEROOT/src/externals/genf90 \""
+    else:
+        cmake_opts = "\"-D GENF90_PATH=$CIMEROOT/src/externals/pio2/scripts/ \""
+
     stdargs = get_standard_makefile_args(case, shared_lib=True)
 
     gmake_vars =  "CASEROOT={caseroot} MODEL={pio_model} COMP_NAME={pio_model} "\
@@ -150,7 +154,7 @@ def buildlib(bldroot, installpath, case):
                 if item_time  > installed_file_time:
                     safe_copy(item, installed_file)
         expect_string = "NetCDF_C_LIBRARY-ADVANCED"
-        pnetcdf_string = "PnetCDF_C_LIBRARY-ADVANCED"
+        pnetcdf_string = "WITH_PNETCDF:BOOL=ON"
         netcdf4_string = "NetCDF_C_HAS_PARALLEL:BOOL=TRUE"
 
 
@@ -174,6 +178,7 @@ def buildlib(bldroot, installpath, case):
         valid_values += ",pnetcdf"
     if netcdf4_parallel_found:
         valid_values += ",netcdf4p,netcdf4c"
+
     _set_pio_valid_values(case, valid_values)
 
 
@@ -188,7 +193,7 @@ def _set_pio_valid_values(case, valid_values):
         comp_pio_typename = "{}_PIO_TYPENAME".format(comp)
         current_value = case.get_value(comp_pio_typename)
         if current_value not in valid_values:
-            logger.warning("Resetting PIO_TYPENAME to netcdf for component {}".format(comp))
+            logger.warning("Resetting PIO_TYPENAME=netcdf for component {}".format(comp))
             env_run.set_value(comp_pio_typename,"netcdf")
 
 def _main(argv, documentation):

@@ -71,7 +71,7 @@ int main(int argc, char **argv)
             {
                 for (int flv = 0; flv < num_flavors; flv++)
                 {
-                    char filename[PIO_MAX_NAME + 1]; /* Test filename. */
+                    char filename[PIO_MAX_NAME * 2 + 1]; /* Test filename. */
                     int my_comp_idx = 0; /* Index in iosysid array. */
 
                     for (int sample = 0; sample < NUM_SAMPLES; sample++)
@@ -85,11 +85,11 @@ int main(int argc, char **argv)
 
                         /* Create sample file. */
                         if ((ret = create_nc_sample(sample, iosysid[my_comp_idx], flavor[flv], filename, my_rank, NULL)))
-                            ERR(ret);
+                            AERR2(ret, iosysid[my_comp_idx]);
 
                         /* Check the file for correctness. */
                         if ((ret = check_nc_sample(sample, iosysid[my_comp_idx], flavor[flv], filename, my_rank, NULL)))
-                            ERR(ret);
+                            AERR2(ret, iosysid[my_comp_idx]);
                     }
                 } /* next netcdf flavor */
 

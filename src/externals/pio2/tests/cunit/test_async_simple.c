@@ -90,7 +90,7 @@ int main(int argc, char **argv)
 
                 for (int sample = 0; sample < NUM_SAMPLES; sample++)
                 {
-                    char filename[PIO_MAX_NAME + 1]; /* Test filename. */
+                    char filename[PIO_MAX_NAME * 2 + 1]; /* Test filename. */
                     char iotype_name[PIO_MAX_NAME + 1];
 
                     /* Create a filename. */
@@ -100,11 +100,11 @@ int main(int argc, char **argv)
 
                     /* Create sample file. */
                     if ((ret = create_nc_sample(sample, iosysid[my_comp_idx], flavor[flv], filename, my_rank, NULL)))
-                        ERR(ret);
+                        AERR2(ret, iosysid[my_comp_idx]);
 
                     /* Check the file for correctness. */
                     if ((ret = check_nc_sample(sample, iosysid[my_comp_idx], flavor[flv], filename, my_rank, NULL)))
-                        ERR(ret);
+                        AERR2(ret, iosysid[my_comp_idx]);
                 }
             } /* next netcdf flavor */
 
