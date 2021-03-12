@@ -1408,11 +1408,12 @@ This allows using a different mpirun command to launch unit tests
 	<command name="purge"></command>
       </modules>
       <modules compiler="intel">
-	<command name="load">compiler/intel/19.0.2</command>
-	<command name="load">tool/netcdf/4.6.1/intel</command>
+	<command name="load">compiler/intel/20.0.1</command>
+	<command name="load">tool/netcdf/4.7.4/intel/20.0.1</command>
+	<command name="load">tool/hdf5/1.12.0/intel/20.0.1</command>
       </modules>
       <modules compiler="intel" mpilib="mvapich2">
-	<command name="load">mvapich2/2.3/intel-cluster-19.0.1</command>
+	<command name="load">mpi/2.3.3/intel/20.0.1</command>
       </modules>
       <modules compiler="pgi">
 	<command name="load">compiler/pgi/18.10</command>
