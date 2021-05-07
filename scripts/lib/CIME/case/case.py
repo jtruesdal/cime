@@ -1272,7 +1272,11 @@ leveraging version control (git or svn).
                 readme_file = os.path.join(directory, "README")
                 with open(readme_file, "w") as fd:
                     fd.write(readme_message.format(component=component))
-
+            if "cam" in component:
+                directory = os.path.join(self._caseroot,"SourceMods","src.{}.libfv3core".format(component))
+                os.makedirs(directory)
+                directory = os.path.join(self._caseroot,"SourceMods","src.{}.libmpas".format(component))
+                os.makedirs(directory)
         if get_model() == "cesm":
         # Note: this is CESM specific, given that we are referencing cism explitly
             if "cism" in components:

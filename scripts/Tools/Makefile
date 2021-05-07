@@ -531,10 +531,12 @@ cospsimulator_intr.o: $(COSP_LIBDIR)/libcosp.a
 endif
 
 ifdef FV3CORE_LIBDIR
-$(FV3CORE_LIBDIR)/libfv3core.a: $(EXEROOT)/FMS/libfms.a
+.PHONY: libfv3
+libfv3: $(EXEROOT)/FMS/libfms.a
 	$(MAKE) -C $(FV3CORE_LIBDIR) complib COMPLIB='$(FV3CORE_LIBDIR)/libfv3core.a' F90='$(FC)' CC='$(CC)' FFLAGS='$(FFLAGS) $(FC_AUTO_R8)'  CFLAGS='$(CFLAGS)' INCLDIR='$(INCLDIR)' FC_TYPE='$(COMPILER)'
 
-dyn_grid.o: $(FV3CORE_LIBDIR)/libfv3core.a
+dyn_comp.o: libfv3
+dyn_grid.o: libfv3
 endif
 
 ifdef MPAS_LIBDIR
