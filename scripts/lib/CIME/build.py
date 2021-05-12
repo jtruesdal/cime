@@ -11,8 +11,8 @@ from CIME.XML.files             import Files
 logger = logging.getLogger(__name__)
 
 _CMD_ARGS_FOR_BUILD = \
-    ("CASEROOT", "CASETOOLS", "CIMEROOT", "COMP_INTERFACE",
-     "COMPILER", "DEBUG", "EXEROOT", "INCROOT", "LIBROOT",
+    ("CASEROOT", "CASETOOLS", "CIMEROOT", "SRCROOT", "COMP_INTERFACE",
+     "COMPILER", "DEBUG", "EXEROOT", "INCROOT", "LIBROOT", "LILAC_MODE",
      "MACH", "MPILIB", "NINST_VALUE", "OS", "PIO_VERSION",
      "SHAREDLIBROOT", "SMP_PRESENT", "USE_ESMF_LIB", "USE_MOAB",
      "CAM_CONFIG_OPTS", "COMP_LND", "COMPARE_TO_NUOPC", "HOMME_TARGET",
@@ -143,7 +143,7 @@ def _build_model(build_threaded, exeroot, incroot, complist,
             if comp_interface == "nuopc":
                 config_dir = os.path.join(os.path.dirname(files.get_value("BUILD_LIB_FILE",{"lib":"CMEPS"})))
             else:
-                config_dir = os.path.join(cimeroot,"src","drivers","mct","cime_config")
+                config_dir = os.path.join(files.get_value("COMP_ROOT_DIR_CPL"),"cime_config")
 
         expect(os.path.exists(config_dir), "Config directory not found {}".format(config_dir))
         if "cpl" in complist:
@@ -169,8 +169,8 @@ def _build_model(build_threaded, exeroot, incroot, complist,
     return logs
 
 ###############################################################################
-def _build_model_cmake(exeroot, complist, lid, cimeroot, buildlist,
-                       comp_interface, sharedpath, separate_builds, ninja, dry_run, case):
+def _build_model_cmake(exeroot, complist, lid, buildlist, comp_interface,
+                       sharedpath, separate_builds, ninja, dry_run, case):
 ###############################################################################
     cime_model = get_model()
     bldroot    = os.path.join(exeroot, "cmake-bld")
@@ -189,10 +189,11 @@ def _build_model_cmake(exeroot, complist, lid, cimeroot, buildlist,
     # regardless of requested build list
     cmp_cmake_args = ""
     all_models = []
+    files = Files(comp_interface=comp_interface)
     for model, _, _, _, config_dir in complist:
         # Create the Filepath and CIME_cppdefs files
         if model == "cpl":
-            config_dir = os.path.join(cimeroot, "src", "drivers", comp_interface, "cime_config")
+            config_dir = os.path.join(files.get_value("COMP_ROOT_DIR_CPL"),"cime_config")
 
         cmp_cmake_args += _create_build_metadata_for_component(config_dir, libroot, bldroot, case)
         all_models.append(model)
@@ -401,7 +402,8 @@ def _build_libraries(case, exeroot, sharedpath, caseroot, cimeroot, libroot, lid
         # this configuration and CDEPS relies on unreleased ESMF code. Eventually we will
         # require CDEPS (for its streams functionality), at which point CDEPS should only
         # require released ESMF code; then we should remove the 'lilac_mode' part of this
-        # conditional.
+        # conditional and the similar conditional in the Makefile (along with the addition
+        # of LILAC_MODE to _CMD_ARGS_FOR_BUILD).
         libs.append("CDEPS")
 
     ocn_model = case.get_value("COMP_OCN")
@@ -725,8 +727,8 @@ def _case_build_impl(caseroot, case, sharedlib_only, model_only, buildlist,
 
     if not sharedlib_only:
         if get_model() == "e3sm":
-            logs.extend(_build_model_cmake(exeroot, complist, lid, cimeroot, buildlist,
-                                           comp_interface, sharedpath, separate_builds, ninja, dry_run, case))
+            logs.extend(_build_model_cmake(exeroot, complist, lid, buildlist, comp_interface,
+                                           sharedpath, separate_builds, ninja, dry_run, case))
         else:
             os.environ["INSTALL_SHAREDPATH"] = os.path.join(exeroot, sharedpath) # for MPAS makefile generators
             logs.extend(_build_model(build_threaded, exeroot, incroot, complist,

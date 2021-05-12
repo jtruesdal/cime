@@ -354,29 +354,26 @@ This allows using a different mpirun command to launch unit tests
   </machine>
 
    <machine MACH="casper">
-    <DESC>NCAR GPU platform, os is Linux, 36 pes/node, batch system is slurm</DESC>
+    <DESC>NCAR GPU platform, os is Linux, 36 pes/node, batch system is pbs</DESC>
     <NODENAME_REGEX>casper*</NODENAME_REGEX>
-    <!-- MPT sometimes timesout at model start time, the next two lines cause
-    case_run.py to detect the timeout and retry FORCE_SPARE_NODES times -->
     <OS>LINUX</OS>
-    <COMPILERS>pgi</COMPILERS>
-    <MPILIBS compiler="pgi" >openmpi</MPILIBS>
+    <COMPILERS>pgi,intel,nvhpc,pgi-gpu,nvhpc-gpu</COMPILERS>
+    <MPILIBS>openmpi</MPILIBS>
     <CIME_OUTPUT_ROOT>/glade/scratch/$USER</CIME_OUTPUT_ROOT>
     <DIN_LOC_ROOT>$ENV{CESMDATAROOT}/inputdata</DIN_LOC_ROOT>
     <DIN_LOC_ROOT_CLMFORC>/glade/p/cgd/tss/CTSM_datm_forcing_data</DIN_LOC_ROOT_CLMFORC>
     <DOUT_S_ROOT>$CIME_OUTPUT_ROOT/archive/$CASE</DOUT_S_ROOT>
     <BASELINE_ROOT>$ENV{CESMDATAROOT}/cesm_baselines</BASELINE_ROOT>
     <GMAKE_J>8</GMAKE_J>
-    <BATCH_SYSTEM>slurm</BATCH_SYSTEM>
-    <SUPPORTED_BY>CISL-STP</SUPPORTED_BY>
-    <!-- have not seen any performance benefit in smt -->
+    <BATCH_SYSTEM>pbs</BATCH_SYSTEM>
+    <SUPPORTED_BY>CISL</SUPPORTED_BY>
     <MAX_TASKS_PER_NODE>36</MAX_TASKS_PER_NODE>
     <MAX_MPITASKS_PER_NODE>36</MAX_MPITASKS_PER_NODE>
     <PROJECT_REQUIRED>TRUE</PROJECT_REQUIRED>
     <mpirun mpilib="default">
       <executable>mpirun</executable>
       <arguments>
-        <arg name="num_tasks"> -np {{ total_tasks }}</arg>
+        <arg name="anum_tasks"> -np {{ total_tasks }}</arg>
       </arguments>
     </mpirun>
     <mpirun mpilib="openmpi">
@@ -396,17 +393,66 @@ This allows using a different mpirun command to launch unit tests
       <cmd_path lang="csh">module</cmd_path>
       <modules>
         <command name="purge"/>
-      </modules>
-      <modules>
         <command name="load">ncarenv/1.3</command>
+        <command name="load">cmake/3.18.2</command>
       </modules>
       <modules compiler="pgi">
         <command name="load">pgi/20.4</command>
       </modules>
+      <modules compiler="pgi-gpu">
+        <command name="load">pgi/20.4</command>
+      </modules>
+      <modules compiler="nvhpc">
+        <command name="load">nvhpc/20.9</command>
+      </modules>
+      <modules compiler="nvhpc-gpu">
+        <command name="load">nvhpc/20.9</command>
+      </modules>
+      <modules compiler="intel">
+        <command name="load">intel/19.1.1</command>
+        <command name="load">mkl/2020.0.1</command>
+      </modules>
       <modules mpilib="openmpi" compiler="pgi">
-        <command name="load">openmpi/3.1.4</command>
+        <command name="load">openmpi/4.1.0</command>
         <command name="load">netcdf-mpi/4.7.4</command>
-        <command name="load">pnetcdf/1.12.1</command>
+        <command name="load">pnetcdf/1.12.2</command>
+      </modules>
+      <modules mpilib="mpi-serial" compiler="pgi">
+        <command name="load">netcdf/4.7.4</command>
+      </modules>
+      <modules mpilib="openmpi" compiler="pgi-gpu">
+        <command name="load">openmpi/4.1.0</command>
+        <command name="load">netcdf-mpi/4.7.4</command>
+        <command name="load">pnetcdf/1.12.2</command>
+        <command name="load">cuda/11.0.3</command>
+      </modules>
+      <modules mpilib="mpi-serial" compiler="pgi-gpu">
+        <command name="load">netcdf/4.7.4</command>
+      </modules>
+      <modules mpilib="openmpi" compiler="nvhpc">
+        <command name="load">openmpi/4.1.0</command>
+        <command name="load">netcdf-mpi/4.7.4</command>
+        <command name="load">pnetcdf/1.12.2</command>
+      </modules>
+      <modules mpilib="mpi-serial" compiler="nvhpc">
+        <command name="load">netcdf/4.7.4</command>
+      </modules>
+      <modules mpilib="openmpi" compiler="nvhpc-gpu">
+        <command name="load">openmpi/4.1.0</command>
+        <command name="load">netcdf-mpi/4.7.4</command>
+        <command name="load">pnetcdf/1.12.2</command>
+        <command name="load">cuda/11.0.3</command>
+      </modules>
+      <modules mpilib="mpi-serial" compiler="nvhpc-gpu">
+        <command name="load">netcdf/4.7.4</command>
+      </modules>
+      <modules mpilib="openmpi" compiler="intel">
+        <command name="load">openmpi/4.1.0</command>
+        <command name="load">netcdf-mpi/4.7.4</command>
+        <command name="load">pnetcdf/1.12.2</command>
+      </modules>
+      <modules mpilib="mpi-serial" compiler="intel">
+        <command name="load">netcdf/4.7.4</command>
       </modules>
       <modules>
         <command name="load">ncarcompilers/0.5.0</command>
@@ -472,6 +518,7 @@ This allows using a different mpirun command to launch unit tests
       <arguments>
         <arg name="labelstdout">-p "%g:"</arg>
         <arg name="num_tasks"> -np {{ total_tasks }}</arg>
+        <arg name="zthreadplacement"> omplace -tm open64 -vv</arg>
       </arguments>
     </mpirun>
     <mpirun mpilib="mpt" queue="share" comp_interface="nuopc">
@@ -507,7 +554,7 @@ This allows using a different mpirun command to launch unit tests
         <command name="load">cmake</command>
       </modules>
       <modules compiler="intel">
-        <command name="load">intel/19.0.5</command>
+        <command name="load">intel/19.1.1</command>
         <command name="load">esmf_libs</command>
         <command name="load">mkl</command>
       </modules>
@@ -519,20 +566,20 @@ This allows using a different mpirun command to launch unit tests
         <command name="load">pgi/20.4</command>
       </modules>
       <modules compiler="intel" mpilib="!mpi-serial" DEBUG="TRUE">
-        <command name="use">/glade/p/cesmdata/cseg/PROGS/modulefiles/esmfpkgs/intel/19.0.5/</command>
-        <command name="load">esmf-8.1.0b41-ncdfio-mpt-g</command>
+        <command name="use">/glade/p/cesmdata/cseg/PROGS/modulefiles/esmfpkgs/intel/19.1.1/</command>
+        <command name="load">esmf-8.1.1-ncdfio-mpt-g</command>
       </modules>
       <modules compiler="intel" mpilib="!mpi-serial" DEBUG="FALSE">
-        <command name="use">/glade/p/cesmdata/cseg/PROGS/modulefiles/esmfpkgs/intel/19.0.5/</command>
-        <command name="load">esmf-8.1.0b41-ncdfio-mpt-O</command>
+        <command name="use">/glade/p/cesmdata/cseg/PROGS/modulefiles/esmfpkgs/intel/19.1.1/</command>
+        <command name="load">esmf-8.1.1-ncdfio-mpt-O</command>
       </modules>
       <modules compiler="intel" mpilib="mpi-serial" DEBUG="TRUE">
-        <command name="use">/glade/p/cesmdata/cseg/PROGS/modulefiles/esmfpkgs/intel/19.0.5/</command>
-        <command name="load">esmf-8.1.0b41-ncdfio-mpiuni-g</command>
+        <command name="use">/glade/p/cesmdata/cseg/PROGS/modulefiles/esmfpkgs/intel/19.1.1/</command>
+        <command name="load">esmf-8.1.1-ncdfio-mpiuni-g</command>
       </modules>
       <modules compiler="intel" mpilib="mpi-serial" DEBUG="FALSE">
-        <command name="use">/glade/p/cesmdata/cseg/PROGS/modulefiles/esmfpkgs/intel/19.0.5/</command>
-        <command name="load">esmf-8.1.0b41-ncdfio-mpiuni-O</command>
+        <command name="use">/glade/p/cesmdata/cseg/PROGS/modulefiles/esmfpkgs/intel/19.1.1/</command>
+        <command name="load">esmf-8.1.1-ncdfio-mpiuni-O</command>
       </modules>
       <modules compiler="gnu" mpilib="mpt" DEBUG="TRUE">
         <command name="use">/glade/p/cesmdata/cseg/PROGS/modulefiles/esmfpkgs/gnu/9.1.0/</command>
@@ -589,10 +636,9 @@ This allows using a different mpirun command to launch unit tests
         <command name="load">pnetcdf/1.12.1</command>
       </modules>
       <modules mpilib="mpt" compiler="intel">
-        <command name="load">mpt/2.21</command>
-        <!-- known failure in parallel netcdf with mpt, use serial -->
-        <command name="load">netcdf/4.7.3</command>
-        <command name="load">pnetcdf/1.12.1</command>
+        <command name="load">mpt/2.22</command>
+        <command name="load">netcdf-mpi/4.7.4</command>
+        <command name="load">pnetcdf/1.12.2</command>
       </modules>
       <modules mpilib="mpt" compiler="pgi">
         <command name="load">mpt/2.19</command>
@@ -633,16 +679,17 @@ This allows using a different mpirun command to launch unit tests
       <env name="UGCSINPUTPATH">/glade/work/turuncu/FV3GFS/benchmark-inputs/2012010100/gfs/fcst</env>
       <env name="UGCSFIXEDFILEPATH">/glade/work/turuncu/FV3GFS/fix_am</env>
       <env name="UGCSADDONPATH">/glade/work/turuncu/FV3GFS/addon</env>
+      <env name="OMP_WAIT_POLICY">PASSIVE</env>
+      <env name="MPI_DSM_VERBOSE">true</env>
     </environment_variables>
     <environment_variables unit_testing="true">
       <env name="MPI_USE_ARRAY">false</env>
     </environment_variables>
     <environment_variables queue="share">
       <env name="TMPDIR">/glade/scratch/$USER</env>
-<!--      <env name="MPI_USE_ARRAY">false</env> -->
     </environment_variables>
     <resource_limits>
-      <resource name="RLIMIT_STACK"> -1</resource>
+      <resource name="RLIMIT_STACK">-1</resource>
     </resource_limits>
   </machine>
 
@@ -1733,6 +1780,9 @@ This allows using a different mpirun command to launch unit tests
       <modules compiler="nag" mpilib="mvapich2">
         <command name="load">mpi/2.3.3/nag/6.2</command>
       </modules>
+      <modules compiler="nag" mpilib="mpi-serial">
+        <command name="rm">mpi</command>
+      </modules>
       <modules compiler="gnu" mpilib="mvapich2" DEBUG="FALSE">
         <command name="use">/fs/cgd/data0/modules/modulefiles/esmfpkgs/gfortran/9.3.0</command>
         <command name="load">esmf-8.1.0b47-ncdfio-mvapich2-O</command>
@@ -2288,8 +2338,8 @@ This allows using a different mpirun command to launch unit tests
         <command name="purge"/>
         <command name="load">nas</command>
         <command name="load">pkgsrc</command>
-        <command name="load">comp-intel/2018.3.222</command>
-        <command name="load">mpi-sgi/mpt.2.15r20</command>
+        <command name="load">comp-intel/2020.4.304</command>
+        <command name="load">mpi-hpe/mpt.2.23</command>
         <command name="load">szip/2.1.1</command>
         <command name="load">hdf4/4.2.12</command>
         <command name="load">hdf5/1.8.18_mpt</command>
@@ -2340,8 +2390,8 @@ This allows using a different mpirun command to launch unit tests
         <command name="purge"/>
         <command name="load">nas</command>
         <command name="load">pkgsrc</command>
-        <command name="load">comp-intel/2018.3.222</command>
-        <command name="load">mpi-sgi/mpt.2.15r20</command>
+        <command name="load">comp-intel/2020.4.304</command>
+        <command name="load">mpi-hpe/mpt.2.23</command>
         <command name="load">szip/2.1.1</command>
         <command name="load">hdf4/4.2.12</command>
         <command name="load">hdf5/1.8.18_mpt</command>
@@ -2392,8 +2442,8 @@ This allows using a different mpirun command to launch unit tests
         <command name="purge"/>
         <command name="load">nas</command>
         <command name="load">pkgsrc</command>
-        <command name="load">comp-intel/2018.3.222</command>
-        <command name="load">mpi-sgi/mpt.2.15r20</command>
+        <command name="load">comp-intel/2020.4.304</command>
+        <command name="load">mpi-hpe/mpt.2.23</command>
         <command name="load">szip/2.1.1</command>
         <command name="load">hdf4/4.2.12</command>
         <command name="load">hdf5/1.8.18_mpt</command>
@@ -2444,8 +2494,8 @@ This allows using a different mpirun command to launch unit tests
         <command name="purge"/>
         <command name="load">nas</command>
         <command name="load">pkgsrc</command>
-        <command name="load">comp-intel/2018.3.222</command>
-        <command name="load">mpi-sgi/mpt.2.15r20</command>
+        <command name="load">comp-intel/2020.4.304</command>
+        <command name="load">mpi-hpe/mpt.2.23</command>
         <command name="load">szip/2.1.1</command>
         <command name="load">hdf4/4.2.12</command>
         <command name="load">hdf5/1.8.18_mpt</command>
@@ -2967,6 +3017,86 @@ This allows using a different mpirun command to launch unit tests
       </arguments>
     </mpirun>
     <module_system type="none" />
+  </machine>
+
+  <machine MACH="zeus">
+    <DESC> CMCC Lenovo ThinkSystem SD530, os is Linux, 36 pes/node, batch system is LSF</DESC>
+    <NODENAME_REGEX>(login[1,2]-ib|n[0-9][0-9][0-9]-ib)</NODENAME_REGEX>
+    <OS>LINUX</OS>
+    <COMPILERS>intel</COMPILERS>
+    <MPILIBS>impi,mpi-serial</MPILIBS>
+    <PROJECT>R000</PROJECT>
+    <CIME_OUTPUT_ROOT>/work/$ENV{DIVISION}/$ENV{USER}/CESM2</CIME_OUTPUT_ROOT>
+    <DIN_LOC_ROOT>$ENV{CESMDATAROOT}/inputdata</DIN_LOC_ROOT>
+    <DIN_LOC_ROOT_CLMFORC>$DIN_LOC_ROOT/atm/datm7</DIN_LOC_ROOT_CLMFORC>
+    <DOUT_S_ROOT>$CIME_OUTPUT_ROOT/archive/$CASE</DOUT_S_ROOT>
+    <BASELINE_ROOT>$ENV{CESMDATAROOT}/ccsm_baselines</BASELINE_ROOT>
+    <CCSM_CPRNC>$ENV{CESMDATAROOT}/cesm2_tools/cprnc/cprnc</CCSM_CPRNC>
+    <PERL5LIB>/usr/lib64/perl5:/usr/share/perl5</PERL5LIB>
+    <GMAKE_J>8</GMAKE_J>
+    <BATCH_SYSTEM>lsf</BATCH_SYSTEM>
+    <SUPPORTED_BY>cmcc</SUPPORTED_BY>
+    <MAX_TASKS_PER_NODE>72</MAX_TASKS_PER_NODE>
+    <MAX_MPITASKS_PER_NODE>36</MAX_MPITASKS_PER_NODE>
+    <PROJECT_REQUIRED>TRUE</PROJECT_REQUIRED>
+    <mpirun mpilib="default">
+      <executable> mpirun </executable>
+    </mpirun>
+    <module_system type="module">
+      <init_path lang="perl">/usr/share/Modules/init/perl.pm</init_path>
+      <init_path lang="python">/usr/share/Modules/init/python.py</init_path>
+      <init_path lang="csh">/usr/share/Modules/init/csh</init_path>
+      <init_path lang="sh">/usr/share/Modules/init/sh</init_path>
+      <cmd_path lang="perl">/usr/bin/modulecmd perl</cmd_path>
+      <cmd_path lang="python">/usr/bin/modulecmd python </cmd_path>
+      <cmd_path lang="sh">module</cmd_path>
+      <cmd_path lang="csh">module</cmd_path>
+      <modules>
+	<command name="purge"/>
+      </modules>
+      <modules compiler="intel">
+	<command name="load">intel20.1/20.1.217</command>
+	<command name="load">intel20.1/szip/2.1.1</command>
+	<command name="load">cmake/3.17.3</command>
+	<command name="load">curl/7.70.0</command>
+      </modules>
+      <modules mpilib="mpi-serial">
+	<command name="load">intel20.1/hdf5/1.12.0</command>
+	<command name="load">intel20.1/netcdf/C_4.7.4-F_4.5.3_CXX_4.3.1</command>
+      </modules>
+      <modules mpilib="!mpi-serial">
+	<command name="load">impi20.1/19.7.217</command>
+	<command name="load">impi20.1/hdf5/1.12.0</command>
+	<command name="load">impi20.1/netcdf/C_4.7.4-F_4.5.3_CXX_4.3.1</command>
+	<command name="load">impi20.1/parallel-netcdf/1.12.1</command>
+      </modules>
+      <modules compiler="intel" mpilib="!mpi-serial" DEBUG="TRUE">
+	<command name="load">impi20.1/esmf/8.0.1-intelmpi-64-g</command>
+      </modules>
+      <modules compiler="intel" mpilib="!mpi-serial" DEBUG="FALSE">
+	<command name="load">impi20.1/esmf/8.0.1-intelmpi-64-O</command>
+      </modules>
+      <modules compiler="intel" mpilib="mpi-serial" DEBUG="TRUE">
+	<command name="load">intel20.1/esmf/8.0.1-mpiuni-64-g</command>
+      </modules>
+      <modules compiler="intel" mpilib="mpi-serial" DEBUG="FALSE">
+	<command name="load">intel20.1/esmf/8.0.1-mpiuni-64-O</command>
+      </modules>
+    </module_system>
+    <environment_variables>
+      <env name="XIOS_PATH">/work/csp/cmip01/csm/xios</env>
+    </environment_variables>
+    <environment_variables compiler="intel">
+      <env name="I_MPI_EXTRA_FILESYSTEM">1</env>
+      <env name="I_MPI_EXTRA_FILESYSTEM_FORCE">gpfs</env>
+      <env name="GPFSMPIO_TUNEBLOCKING">0</env>
+      <env name="I_MPI_DEBUG">60</env>
+      <env name="I_MPI_PLATFORM">skx</env>
+      <env name="I_MPI_SHM">skx_avx512</env>
+      <env name="I_MPI_HYDRA_BOOTSTRAP">lsf</env>
+      <env name="I_MPI_HYDRA_COLLECTIVE_LAUNCH">1</env>
+      <env name="I_MPI_HYDRA_BRANCH_COUNT">{{ num_nodes }}</env>
+    </environment_variables>
   </machine>
 
 

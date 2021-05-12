@@ -3,6 +3,7 @@ Base class for CIME system tests
 """
 from CIME.XML.standard_module_setup import *
 from CIME.XML.env_run import EnvRun
+from CIME.XML.env_test import EnvTest
 from CIME.utils import append_testlog, get_model, safe_copy, get_timestamp, CIMEError, expect, get_current_commit, SharedArea
 from CIME.test_status import *
 from CIME.hist_utils import copy_histfiles, compare_test, generate_teststatus, \
@@ -63,7 +64,10 @@ class SystemTestsCommon(object):
         """
         # We never want to re-setup if we're doing the resubmitted run
         phase_status = self._test_status.get_status(phase)
-        if reset or (self._case.get_value("IS_FIRST_RUN") and phase_status != TEST_PEND_STATUS):
+        phase_comment = self._test_status.get_comment(phase)
+        rerunning = (phase_status != TEST_PEND_STATUS or
+                     phase_comment == TEST_RERUN_COMMENT)
+        if reset or (self._case.get_value("IS_FIRST_RUN") and rerunning):
 
             logging.warning("Resetting case due to detected re-run of phase {}".format(phase))
             self._case.set_initial_test_values()
@@ -318,6 +322,24 @@ class SystemTestsCommon(object):
         comments = copy_histfiles(self._case, suffix)
         append_testlog(comments, self._orig_caseroot)
 
+    def _log_cprnc_output_tail(self, filename_pattern, prepend=None):
+        rundir = self._case.get_value('RUNDIR')
+
+        glob_pattern = "{}/{}".format(rundir, filename_pattern)
+
+        cprnc_logs = glob.glob(glob_pattern)
+
+        for output in cprnc_logs:
+            with open(output) as fin:
+                cprnc_log_tail = fin.readlines()[-20:]
+            
+            cprnc_log_tail.insert(0, "tail -n20 {}\n\n".format(output))
+
+            if prepend is not None:
+                cprnc_log_tail.insert(0, "{}\n\n".format(prepend))
+
+            append_testlog("".join(cprnc_log_tail), self._orig_caseroot)
+
     def _component_compare_test(self, suffix1, suffix2,
                                 success_change=False,
                                 ignore_fieldlist_diffs=False):
@@ -336,6 +358,12 @@ class SystemTestsCommon(object):
             success = not success
 
         append_testlog(comments, self._orig_caseroot)
+
+        pattern = "*.nc.{}.cprnc.out".format(suffix1)
+        message = "compared suffixes suffix1 {!r} suffix2 {!r}".format(suffix1, suffix2)
+
+        self._log_cprnc_output_tail(pattern, message)
+
         status = TEST_PASS_STATUS if success else TEST_FAIL_STATUS
         with self._test_status:
             self._test_status.set_status("{}_{}_{}".format(COMPARE_PHASE, suffix1, suffix2), status)
@@ -547,7 +575,13 @@ class SystemTestsCommon(object):
         with self._test_status:
             # compare baseline
             success, comments = compare_baseline(self._case)
+
             append_testlog(comments, self._orig_caseroot)
+
+            pattern = "*.nc.cprnc.out"
+
+            self._log_cprnc_output_tail(pattern)
+
             status = TEST_PASS_STATUS if success else TEST_FAIL_STATUS
             baseline_name = self._case.get_value("BASECMP_CASE")
             ts_comments = os.path.dirname(baseline_name) + ": " + get_ts_synopsis(comments)
@@ -714,6 +748,33 @@ fi
         self._set_script(script)
         FakeTest.build_phase(self,
                              sharedlib_only=sharedlib_only, model_only=model_only)
+
+class TESTRUNFAILRESET(TESTRUNFAIL):
+    """This fake test can fail for two reasons:
+    1. As in the TESTRUNFAIL test: If the environment variable TESTRUNFAIL_PASS is *not* set
+    2. Even if that environment variable *is* set, it will fail if STOP_N differs from the
+       original value
+
+    The purpose of (2) is to ensure that test's values get properly reset if the test is
+    rerun after an initial failure.
+    """
+
+    def run_indv(self, suffix="base", st_archive=False, submit_resubmits=None):
+        # Make sure STOP_N matches the original value for the case. This tests that STOP_N
+        # has been reset properly if we are rerunning the test after a failure.
+        env_test = EnvTest(self._get_caseroot())
+        stop_n = self._case.get_value("STOP_N")
+        stop_n_test = int(env_test.get_test_parameter("STOP_N"))
+        expect(stop_n == stop_n_test, "Expect STOP_N to match original ({} != {})".format(
+            stop_n, stop_n_test))
+
+        # Now modify STOP_N so that an error will be generated if it isn't reset properly
+        # upon a rerun
+        self._case.set_value("STOP_N", stop_n + 1)
+
+        super(TESTRUNFAILRESET, self).run_indv(suffix=suffix,
+                                               st_archive=st_archive,
+                                               submit_resubmits=submit_resubmits)
 
 class TESTRUNFAILEXC(TESTRUNPASS):
 

@@ -254,6 +254,20 @@ def get_cime_root(case=None):
     logger.debug( "CIMEROOT is " + cimeroot)
     return cimeroot
 
+def get_src_root():
+    """
+    Return the absolute path to the root of SRCROOT.
+
+    """
+    # This if statement will need to be updated when cesm brings in the new share repos.
+    if get_model() == "cesm":
+        srcroot = os.path.abspath(os.path.join(get_cime_root(),".."))
+    else:
+        srcroot = os.path.abspath(os.path.join(get_cime_root(),".."))
+
+    logger.debug( "SRCROOT is " + srcroot)
+    return srcroot
+
 def get_cime_default_driver():
     driver = os.environ.get("CIME_DRIVER")
     if driver:
@@ -485,6 +499,7 @@ def run_cmd(cmd, input_str=None, from_dir=None, verbose=None,
         stdin = subprocess.PIPE
     else:
         stdin = None
+
     if timeout:
         with Timeout(timeout):
             proc = subprocess.Popen(cmd,
@@ -1776,18 +1791,38 @@ def verbatim_success_msg(return_val):
 
 CASE_SUCCESS = "success"
 CASE_FAILURE = "error"
-def run_and_log_case_status(func, phase, caseroot='.', custom_success_msg_functor=None):
-    append_case_status(phase, "starting", caseroot=caseroot)
+def run_and_log_case_status(func, phase, caseroot='.',
+                            custom_starting_msg_functor=None,
+                            custom_success_msg_functor=None, 
+                            is_batch=False):
+    starting_msg = None
+
+    if custom_starting_msg_functor is not None:
+        starting_msg = custom_starting_msg_functor()
+
+    # Delay appending "starting" on "case.subsmit" phase when batch system is
+    # present since we don't have the jobid yet
+    if phase != "case.submit" or not is_batch:
+        append_case_status(phase, "starting", msg=starting_msg, caseroot=caseroot)
     rv = None
     try:
         rv = func()
     except BaseException:
+        custom_success_msg = custom_success_msg_functor(rv) if custom_success_msg_functor else None
+        if phase == "case.submit" and is_batch:
+            append_case_status(phase, "starting", msg=custom_success_msg,
+                            caseroot=caseroot)
         e = sys.exc_info()[1]
-        append_case_status(phase, CASE_FAILURE, msg=("\n{}".format(e)), caseroot=caseroot)
+        append_case_status(phase, CASE_FAILURE, msg=("\n{}".format(e)),
+                           caseroot=caseroot)
         raise
     else:
         custom_success_msg = custom_success_msg_functor(rv) if custom_success_msg_functor else None
-        append_case_status(phase, CASE_SUCCESS, msg=custom_success_msg, caseroot=caseroot)
+        if phase == "case.submit" and is_batch:
+            append_case_status(phase, "starting", msg=custom_success_msg,
+                            caseroot=caseroot)
+        append_case_status(phase, CASE_SUCCESS, msg=custom_success_msg, 
+                           caseroot=caseroot)
 
     return rv
 

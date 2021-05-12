@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Script containing CIME python regression test suite. This suite should be run
@@ -585,7 +585,14 @@ class J_TestCreateNewcase(unittest.TestCase):
 
         cls._testdirs.append(testdir)
 
-        pesfile = os.path.join("..","src","drivers","mct","cime_config","config_pes.xml")
+        if CIME.utils.get_model() == "cesm":
+            # Will need to be updated when cesm brings in new share repo new line will be.
+            # pesfile = os.path.join(get_src_root(),"cpl7","driver","cime_config","config_pes.xml")
+            # or
+            # pesfile = os.path.join(get_src_root(),"components","cmeps","cime_config","config_pes.xml")
+            pesfile = os.path.join("..","src","drivers",CIME.utils.get_cime_default_driver(),"cime_config","config_pes.xml")
+        else:
+            pesfile = os.path.join("..","src","drivers",CIME.utils.get_cime_default_driver(),"cime_config","config_pes.xml")
         args =  "--case %s --compset 2000_SATM_XLND_SICE_SOCN_XROF_XGLC_SWAV  --pesfile %s --res f19_g16 --output-root %s --handle-preexisting-dirs=r" % (testdir, pesfile, cls._testroot)
         if CIME.utils.get_model() == "cesm":
             args += " --run-unsupported"
@@ -706,7 +713,12 @@ class J_TestCreateNewcase(unittest.TestCase):
         if os.path.exists(testdir1):
             shutil.rmtree(testdir1)
         cls._testdirs.append(testdir1)
-        args = ' --case CreateNewcaseTest --script-root {} --compset 2000_DATM%NYF_SLND_SICE_DOCN%SOMAQP_SROF_SGLC_SWAV --res f19_g16 --output-root {} --handle-preexisting-dirs u' .format(testdir1, cls._testroot)
+
+        args = ' --case CreateNewcaseTest --script-root {} --compset 2000_DATM%NYF_SLND_SICE_DOCN%SOMAQP_SROF_SGLC_SWAV --output-root {} --handle-preexisting-dirs u' .format(testdir1, cls._testroot)
+        if CIME.utils.get_cime_default_driver() == "nuopc":
+            args += " --res f19_g17 "
+        else:
+            args += " --res f19_g16 "
         if CIME.utils.get_model() == "cesm":
             args += " --run-unsupported"
         if TEST_COMPILER is not None:
@@ -736,7 +748,11 @@ class J_TestCreateNewcase(unittest.TestCase):
         if os.path.exists(testdir2):
             shutil.rmtree(testdir2)
         cls._testdirs.append(testdir2)
-        args = ' --case CreateNewcaseTest --script-root {} --compset ADSOMAQP --res f19_g16 --output-root {} --handle-preexisting-dirs u'.format(testdir2, cls._testroot)
+        args = ' --case CreateNewcaseTest --script-root {} --compset ADSOMAQP --output-root {} --handle-preexisting-dirs u'.format(testdir2, cls._testroot)
+        if CIME.utils.get_cime_default_driver() == "nuopc":
+            args += " --res f19_g17 "
+        else:
+            args += " --res f19_g16 "
         if CIME.utils.get_model() == "cesm":
             args += " --run-unsupported"
         if TEST_COMPILER is not None:
@@ -1036,14 +1052,14 @@ class M_TestWaitForTests(unittest.TestCase):
 
         time.sleep(5) # Kinda hacky
 
-        self.assertTrue(run_thread.isAlive(), msg="wait_for_tests should have waited")
+        self.assertTrue(run_thread.is_alive(), msg="wait_for_tests should have waited")
 
         with TestStatus(test_dir=os.path.join(self._testdir_unfinished, "5")) as ts:
             ts.set_status(RUN_PHASE, TEST_PASS_STATUS)
 
         run_thread.join(timeout=10)
 
-        self.assertFalse(run_thread.isAlive(), msg="wait_for_tests should have finished")
+        self.assertFalse(run_thread.is_alive(), msg="wait_for_tests should have finished")
 
         self.assertTrue(self._thread_error is None, msg="Thread had failure: %s" % self._thread_error)
 
@@ -1056,14 +1072,14 @@ class M_TestWaitForTests(unittest.TestCase):
 
         time.sleep(5) # Kinda hacky
 
-        self.assertTrue(run_thread.isAlive(), msg="wait_for_tests should have waited")
+        self.assertTrue(run_thread.is_alive(), msg="wait_for_tests should have waited")
 
         with TestStatus(test_dir=os.path.join(self._testdir_unfinished2, "5")) as ts:
             ts.set_status(RUN_PHASE, TEST_PASS_STATUS)
 
         run_thread.join(timeout=10)
 
-        self.assertFalse(run_thread.isAlive(), msg="wait_for_tests should have finished")
+        self.assertFalse(run_thread.is_alive(), msg="wait_for_tests should have finished")
 
         self.assertTrue(self._thread_error is None, msg="Thread had failure: %s" % self._thread_error)
 
@@ -1077,13 +1093,13 @@ class M_TestWaitForTests(unittest.TestCase):
 
         time.sleep(5)
 
-        self.assertTrue(run_thread.isAlive(), msg="wait_for_tests should have waited")
+        self.assertTrue(run_thread.is_alive(), msg="wait_for_tests should have waited")
 
         kill_python_subprocesses(signal.SIGTERM, expected_num_killed=1, tester=self)
 
         run_thread.join(timeout=10)
 
-        self.assertFalse(run_thread.isAlive(), msg="wait_for_tests should have finished")
+        self.assertFalse(run_thread.is_alive(), msg="wait_for_tests should have finished")
 
         self.assertTrue(self._thread_error is None, msg="Thread had failure: %s" % self._thread_error)
 
@@ -1099,7 +1115,7 @@ class M_TestWaitForTests(unittest.TestCase):
 
         run_thread.join(timeout=10)
 
-        self.assertFalse(run_thread.isAlive(), msg="wait_for_tests should have finished")
+        self.assertFalse(run_thread.is_alive(), msg="wait_for_tests should have finished")
 
         self.assertTrue(self._thread_error is None, msg="Thread had failure: %s" % self._thread_error)
 
@@ -1117,13 +1133,13 @@ class M_TestWaitForTests(unittest.TestCase):
 
         time.sleep(5)
 
-        self.assertTrue(run_thread.isAlive(), msg="wait_for_tests should have waited")
+        self.assertTrue(run_thread.is_alive(), msg="wait_for_tests should have waited")
 
         kill_python_subprocesses(signal.SIGTERM, expected_num_killed=1, tester=self)
 
         run_thread.join(timeout=10)
 
-        self.assertFalse(run_thread.isAlive(), msg="wait_for_tests should have finished")
+        self.assertFalse(run_thread.is_alive(), msg="wait_for_tests should have finished")
         self.assertTrue(self._thread_error is None, msg="Thread had failure: %s" % self._thread_error)
 
         assert_dashboard_has_build(self, build_name)
@@ -1154,7 +1170,7 @@ class M_TestWaitForTests(unittest.TestCase):
 
         time.sleep(5)
 
-        self.assertTrue(run_thread.isAlive(), msg="wait_for_tests should have waited")
+        self.assertTrue(run_thread.is_alive(), msg="wait_for_tests should have waited")
 
         for core_phase in CORE_PHASES[1:]:
             with TestStatus(test_dir=os.path.join(self._testdir_teststatus1, "0")) as ts:
@@ -1163,10 +1179,10 @@ class M_TestWaitForTests(unittest.TestCase):
             time.sleep(5)
 
             if core_phase != last_phase:
-                self.assertTrue(run_thread.isAlive(), msg="wait_for_tests should have waited after passing phase {}".format(core_phase))
+                self.assertTrue(run_thread.is_alive(), msg="wait_for_tests should have waited after passing phase {}".format(core_phase))
             else:
                 run_thread.join(timeout=10)
-                self.assertFalse(run_thread.isAlive(), msg="wait_for_tests should have finished after phase {}".format(core_phase))
+                self.assertFalse(run_thread.is_alive(), msg="wait_for_tests should have finished after phase {}".format(core_phase))
                 break
 
         self.assertTrue(self._thread_error is None, msg="Thread had failure: %s" % self._thread_error)
@@ -1534,7 +1550,7 @@ class O_TestTestScheduler(TestCreateTestCommon):
     ###########################################################################
     def test_d_retry(self):
     ###########################################################################
-        args = ["TESTBUILDFAIL_P1.f19_g16_rx1.A", "TESTRUNFAIL_P1.f19_g16_rx1.A", "TESTRUNPASS_P1.f19_g16_rx1.A", "--retry=1"]
+        args = ["TESTBUILDFAIL_P1.f19_g16_rx1.A", "TESTRUNFAILRESET_P1.f19_g16_rx1.A", "TESTRUNPASS_P1.f19_g16_rx1.A", "--retry=1"]
 
         self._create_test(args)
 
@@ -1630,7 +1646,7 @@ class P_TestJenkinsGenericJob(TestCreateTestCommon):
 
         run_thread.join(timeout=30)
 
-        self.assertFalse(run_thread.isAlive(), msg="jenkins_generic_job should have finished")
+        self.assertFalse(run_thread.is_alive(), msg="jenkins_generic_job should have finished")
         self.assertTrue(self._thread_error is None, msg="Thread had failure: %s" % self._thread_error)
         assert_dashboard_has_build(self, build_name)
 
