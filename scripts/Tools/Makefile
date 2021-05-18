@@ -551,6 +551,9 @@ ifdef MPAS_LIBDIR
   ifeq ($(PIO_VERSION),2)
     PIODEF := -DUSE_PIO2
   endif
+  ifeq ($(COMP_INTERFACE), nuopc)
+    ESMFDEF := -DMPAS_EXTERNAL_ESMF_LIB
+  endif
   INCLDIR+=-I$(MPAS_LIBDIR)
   INCLDIR+=-I$(abspath $(EXEROOT)/atm/obj)
 
@@ -561,7 +564,7 @@ ifdef MPAS_LIBDIR
 .PHONY: libmpas
 libmpas: cam_abortutils.o physconst.o
 	$(MAKE) -C $(MPAS_LIBDIR) CC="$(CC)" FC="$(FC)" PIODEF="$(PIODEF)" FFLAGS='$(FREEFLAGS) $(FFLAGS)' \
-	FCINCLUDES='$(INCLDIR) $(INCS) -I$(ABS_INSTALL_SHAREDPATH)/include -I$(ABS_ESMF_PATH)/include'
+	ESMFDEF="$(ESMFDEF)" FCINCLUDES='$(INCLDIR) $(INCS) -I$(ABS_INSTALL_SHAREDPATH)/include -I$(ABS_ESMF_PATH)/include'
 
 dyn_comp.o: libmpas
 dyn_grid.o: libmpas
