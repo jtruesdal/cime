@@ -592,6 +592,11 @@
       <map name="ROF2LND_FMAPNAME">lnd/clm2/mappingdata/maps/C384/map_0.5x0.5_TO_C384_aave.181018.nc</map>
     </gridmap>
 
+    <gridmap lnd_grid="mpasa60" rof_grid="r05">
+      <map name="LND2ROF_FMAPNAME">lnd/clm2/mappingdata/mpas/mpasa60/map_mpasa60_nomask_to_0.5x0.5_nomask_aave_da_c210510.nc</map>
+      <map name="ROF2LND_FMAPNAME">lnd/clm2/mappingdata/maps/mpasa60/map_0.5x0.5_TO_mpasa60_aave.210510.nc</map>
+    </gridmap>
+
     <gridmap lnd_grid="mpasa120" rof_grid="r05">
       <map name="LND2ROF_FMAPNAME">lnd/clm2/mappingdata/maps/mpasa120/map_mpasa120_nomask_to_0.5x0.5_nomask_aave_da_c201215.nc</map>
       <map name="ROF2LND_FMAPNAME">lnd/clm2/mappingdata/maps/mpasa120/map_0.5x0.5_TO_mpasa120_aave.201215.nc</map>
@@ -832,6 +837,13 @@
       <map name="LND2GLC_SMAPNAME">cpl/gridmaps/fv4x5/map_fv4x5_TO_gland4km_blin.170429.nc</map>
       <map name="GLC2LND_FMAPNAME">cpl/gridmaps/gland4km/map_gland4km_TO_fv4x5_aave.170429.nc</map>
       <map name="GLC2LND_SMAPNAME">cpl/gridmaps/gland4km/map_gland4km_TO_fv4x5_aave.170429.nc</map>
+    </gridmap>
+
+    <gridmap lnd_grid="mpasa60" glc_grid="gland4">
+      <map name="LND2GLC_FMAPNAME">cpl/gridmaps/mpasa60/map_mpasa60_TO_gland4km_aave.210510.nc</map>
+      <map name="LND2GLC_SMAPNAME">cpl/gridmaps/mpasa60/map_mpasa60_TO_gland4km_blin.210510.nc</map>
+      <map name="GLC2LND_FMAPNAME">cpl/gridmaps/mpasa60/map_gland4km_TO_mpasa60_aave.210510.nc</map>
+      <map name="GLC2LND_SMAPNAME">cpl/gridmaps/mpasa60/map_gland4km_TO_mpasa60_aav.210510.nc</map>
     </gridmap>
 
     <gridmap lnd_grid="mpasa120" glc_grid="gland4" >

@@ -1607,7 +1607,10 @@
     </domain>
     <domain name="mpasa60">
       <nx>163842</nx> <ny>1</ny>
+      <file grid="atm|lnd" mask="tx0.1v2">$DIN_LOC_ROOT/share/domains/domain.lnd.mpasa60_tx0.1v2.210517.nc</file>
+      <file grid="ocnice"  mask="tx0.1v2">$DIN_LOC_ROOT/share/domains/domain.ocn.mpasa60_tx0.1v2.210517.nc</file>
       <desc>MPAS-A 60-km quasi-uniform mesh:</desc>
+      <support>Test support only</support>
     </domain>
     <domain name="mpasa30">
       <nx>655362</nx> <ny>1</ny>
