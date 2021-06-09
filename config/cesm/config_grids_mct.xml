@@ -855,7 +855,7 @@
       <map name="LND2GLC_FMAPNAME">cpl/gridmaps/mpasa60/map_mpasa60_TO_gland4km_aave.210510.nc</map>
       <map name="LND2GLC_SMAPNAME">cpl/gridmaps/mpasa60/map_mpasa60_TO_gland4km_blin.210510.nc</map>
       <map name="GLC2LND_FMAPNAME">cpl/gridmaps/mpasa60/map_gland4km_TO_mpasa60_aave.210510.nc</map>
-      <map name="GLC2LND_SMAPNAME">cpl/gridmaps/mpasa60/map_gland4km_TO_mpasa60_aav.210510.nc</map>
+      <map name="GLC2LND_SMAPNAME">cpl/gridmaps/mpasa60/map_gland4km_TO_mpasa60_aave.210510.nc</map>
     </gridmap>
 
     <gridmap lnd_grid="mpasa120" glc_grid="gland4" >
