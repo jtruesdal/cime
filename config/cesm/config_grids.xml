@@ -1614,8 +1614,8 @@
     </domain>
     <domain name="mpasa30">
       <nx>655362</nx> <ny>1</ny>
-      <file grid="atm|lnd" mask="">$DIN_LOC_ROOT/share/domains/domain.lnd.mpasa30_gx1v7.210601.nc</file>
-      <file grid="ocnice"  mask=''>$DIN_LOC_ROOT/share/domains/domain.ocn.mpasa30i_gx1v7.210601.nc</file>
+      <file grid="atm|lnd" mask="gx1v7">$DIN_LOC_ROOT/share/domains/domain.lnd.mpasa30_gx1v7.210601.nc</file>
+      <file grid="ocnice"  mask="gx1v7">$DIN_LOC_ROOT/share/domains/domain.ocn.mpasa30i_gx1v7.210601.nc</file>
       <desc>MPAS-A 30-km quasi-uniform mesh:</desc>
     </domain>
     <domain name="mpasa15">
