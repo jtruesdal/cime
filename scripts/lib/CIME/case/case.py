@@ -1670,7 +1670,7 @@ class Case(object):
 
     def _create_caseroot_sourcemods(self):
         components = self.get_compset_components()
-        components.extend(["share", "drv"])
+        components.extend(["share", "drv", "cam_libmpas", "cam_libfv3"])
         if self._comp_interface == "nuopc":
             components.extend(["cdeps"])
 
