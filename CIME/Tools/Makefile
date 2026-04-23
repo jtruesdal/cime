@@ -103,6 +103,10 @@ else
   CPPDEFS += -DHAVE_MPI
 endif
 
+ifeq ($(strip $(CAM_PLANET)), mars)
+  CPPDEFS += -Dplanet_mars
+endif
+
 ifeq (,$(SHAREDPATH))
   SHAREDPATH = $(COMPILER)/$(MPILIB)/$(DEBUGDIR)/$(THREADDIR)
   INSTALL_SHAREDPATH = $(EXEROOT)/$(SHAREDPATH)

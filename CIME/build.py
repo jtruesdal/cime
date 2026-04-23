@@ -57,6 +57,7 @@ _CMD_ARGS_FOR_BUILD = (
     "COMP_OCN",
     "COMP_ROF",
     "COMP_WAV",
+    "CAM_PLANET",
     "COMPARE_TO_NUOPC",
     "HOMME_TARGET",
     "OCN_SUBMODEL",
